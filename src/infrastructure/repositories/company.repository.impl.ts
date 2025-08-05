@@ -50,35 +50,67 @@ export class CompanyRepositoryImpl implements CompanyRepository {
 
 
   async findCompaniesByFilter(filter: CompanyFilter): Promise<Company[]> {
-    const queryBuilder = this.companyEntityRepository.createQueryBuilder('company');
-
-    if (filter.joinedFrom || filter.joinedTo) {
-      if (filter.joinedFrom) {
-        queryBuilder.andWhere('company.joinedAt >= :joinedFrom', { joinedFrom: filter.joinedFrom });
-      }
-      if (filter.joinedTo) {
-        queryBuilder.andWhere('company.joinedAt <= :joinedTo', { joinedTo: filter.joinedTo });
-      }
-    }
-
-    if (filter.transferFrom || filter.transferTo) {
-      queryBuilder.innerJoin('company.transfers', 'transfer');
-      
-      if (filter.transferFrom) {
-        queryBuilder.andWhere('transfer.createdAt >= :transferFrom', { transferFrom: filter.transferFrom });
-      }
-      if (filter.transferTo) {
-        queryBuilder.andWhere('transfer.createdAt <= :transferTo', { transferTo: filter.transferTo });
-      }
-    }
-
-    // If no filters, return all companies
+    // If no filters, return all companies (with pagination)
     if (!filter.joinedFrom && !filter.joinedTo && !filter.transferFrom && !filter.transferTo) {
-      return this.findAll();
+      const entities = await this.companyEntityRepository
+        .createQueryBuilder('c')
+        .take(100) // Default page size
+        .getMany();
+      return entities.map(entity => this.entityToDomain(entity));
     }
 
-    const entities = await queryBuilder.getMany();
-    return entities.map(entity => this.entityToDomain(entity));
+    // Build optimized query with EXISTS subquery for transfers
+    const qb = this.companyEntityRepository
+      .createQueryBuilder('c')
+      .select(['c.id', 'c.cuit', 'c.business_name', 'c.joined_at', 'c.type']);
+
+    // Company date filters (use indexes)
+    if (filter.joinedFrom) {
+      qb.andWhere('c.joined_at >= :jf', { jf: filter.joinedFrom });
+    }
+    if (filter.joinedTo) {
+      qb.andWhere('c.joined_at <= :jt', { jt: filter.joinedTo });
+    }
+
+    // Transfer date filters using EXISTS subquery (avoids expensive JOINs)
+    if (filter.transferFrom || filter.transferTo) {
+      qb.andWhere(qb2 => {
+        const subQuery = qb2.subQuery()
+          .select('1')
+          .from(TransferEntity, 't')
+          .where('t.company_id = c.id');
+
+        if (filter.transferFrom) {
+          subQuery.andWhere('t.created_at >= :tf', { tf: filter.transferFrom });
+        }
+        if (filter.transferTo) {
+          subQuery.andWhere('t.created_at <= :tt', { tt: filter.transferTo });
+        }
+
+        return `EXISTS (${subQuery.getQuery()})`;
+      });
+    }
+
+    // Apply pagination
+    qb.take(100);
+
+    // Execute raw query for better performance
+    const rows = await qb.getRawMany<{
+      c_id: string;
+      c_cuit: string;
+      c_business_name: string;
+      c_joined_at: Date;
+      c_type: string;
+    }>();
+
+    // Map raw results to domain entities
+    return rows.map(row => new Company(
+      row.c_id,
+      row.c_cuit,
+      row.c_business_name,
+      row.c_joined_at,
+      new CompanyTypeVO(row.c_type),
+    ));
   }
 
   private entityToDomain(entity: CompanyEntity): Company {

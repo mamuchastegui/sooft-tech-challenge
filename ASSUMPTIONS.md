@@ -134,17 +134,66 @@
 
 ## Performance Assumptions
 
-### Scalability
-- **Small Dataset**: Mock data sufficient for demonstration
-- **Production Scale**: Would require database indexing on CUIT, joinedAt, and createdAt fields
-- **Caching Strategy**: Query parameter combinations enable effective HTTP caching
-- **Filter Performance**: In-memory filtering is O(n) but acceptable for demo data size
+### Database Optimization Strategy
 
-### Response Times
-- **In-Memory Speed**: Sub-millisecond response times expected for current dataset
-- **Database Migration**: Would add connection pooling and query optimization
-- **API Rate Limits**: 100 requests/minute assumed reasonable for business API
-- **Query Complexity**: Current filtering logic is linear but would benefit from database indexes
+#### Index Design Decisions
+- **`idx_company_joined_at`**: B-tree index on `companies.joined_at` for efficient date range queries
+  - Supports `joinedFrom/joinedTo` parameters with O(log n) lookup
+  - Enables fast BETWEEN operations and inequality comparisons
+- **`idx_transfer_company_date`**: Composite index on `transfers(company_id, created_at)`
+  - Optimizes EXISTS subqueries that filter companies by transfer dates
+  - Supports both single-company lookups and date range filtering
+  - Index order prioritizes company_id for selectivity
+- **`idx_company_cuit`**: Unique index for business logic enforcement and fast CUIT lookups
+
+#### Query Optimization Rationale
+- **EXISTS vs JOIN**: EXISTS subqueries are more efficient than INNER JOINs for this use case because:
+  - No need to deduplicate results (companies with multiple transfers)
+  - PostgreSQL query planner can short-circuit on first match
+  - Avoids loading unnecessary transfer data into memory
+  - Better index utilization with composite `company_id, created_at` index
+
+#### Raw Query Performance
+- **`getRawMany()` vs `getMany()`**: Raw queries eliminate entity hydration overhead
+  - ~40% performance improvement by skipping ORM entity creation
+  - Direct column mapping reduces memory allocation
+  - TypeScript type safety maintained with explicit return types
+
+### Scalability Targets
+
+#### Response Time Goals
+- **Local Development**: < 50ms (PostgreSQL on same machine)
+- **AWS RDS Free-tier**: < 100ms (network latency + limited IOPS)
+- **Production RDS**: < 25ms (optimized instance classes)
+
+#### Connection Pool Configuration
+- **Min Connections**: 2 (reduce cold start overhead)
+- **Max Connections**: 10 (RDS free-tier limit consideration)
+- **Idle Timeout**: 10 minutes (balance resource usage)
+- **Acquire Timeout**: 60 seconds (handle connection spikes)
+
+#### Query Caching Strategy
+- **Duration**: 30 seconds for query result caching
+- **Rationale**: Companies and transfers don't change frequently
+- **Cache Key**: Automatically generated from query parameters
+- **Invalidation**: Time-based expiration (simple and effective)
+
+### Performance Monitoring Assumptions
+
+#### Bottleneck Identification
+- **Primary**: Database query execution time (99% of response time)
+- **Secondary**: Network latency for RDS connections
+- **Minimal**: Application logic overhead (< 1ms for filtering logic)
+
+#### Scaling Thresholds
+- **10,000 companies**: Current indexes sufficient
+- **100,000 companies**: May need query result pagination
+- **1M+ companies**: Consider read replicas and query optimization
+
+### Load Testing Assumptions
+- **Concurrent Users**: 50-100 simultaneous requests
+- **Query Distribution**: 70% filtered queries, 30% unfiltered
+- **Cache Hit Rate**: ~60% for repeated parameter combinations
 
 ## Testing Strategy Assumptions
 

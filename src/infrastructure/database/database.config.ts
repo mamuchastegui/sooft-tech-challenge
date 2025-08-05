@@ -17,8 +17,18 @@ export const getDatabaseConfig = (): TypeOrmModuleOptions => {
     password: process.env.DATABASE_PASSWORD || 'sooft_password',
     database: process.env.DATABASE_NAME || 'sooft_tech_db',
     entities: [CompanyEntity, TransferEntity],
-    synchronize: isLocal, // Only in local development
-    logging: isLocal,
+    synchronize: false, // Use migrations only for production safety
+    logging: process.env.NODE_ENV === 'local',
     ssl: isLocal ? false : { rejectUnauthorized: false },
+    extra: {
+      max: 10, // Connection pool max size
+      min: 2,  // Connection pool min size
+      acquireTimeoutMillis: 60000, // Connection timeout
+      idleTimeoutMillis: 600000,   // Idle connection timeout (10 minutes)
+      connectionTimeoutMillis: 10000, // Connection establishment timeout
+    },
+    cache: {
+      duration: 30000, // Cache queries for 30 seconds
+    },
   };
 };
