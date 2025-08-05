@@ -1,0 +1,21 @@
+{
+  "httpMethod": "POST",
+  "path": "/v1/companies",
+  "headers": {
+    "Content-Type": "application/json",
+    "Accept": "application/json"
+  },
+  "body": "{\"cuit\":\"20-12345678-9\",\"businessName\":\"New Tech Company SA\",\"type\":\"CORPORATE\"}",
+  "isBase64Encoded": false,
+  "queryStringParameters": null,
+  "pathParameters": null,
+  "requestContext": {
+    "httpMethod": "POST",
+    "requestId": "test-request-id",
+    "path": "/v1/companies",
+    "stage": "dev",
+    "identity": {
+      "sourceIp": "127.0.0.1"
+    }
+  }
+}
