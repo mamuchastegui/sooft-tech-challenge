@@ -11,7 +11,7 @@ import { CompanyJoinedMonthlyDto } from '../../application/dto/company-joined-mo
 export class ReportController {
   constructor(private readonly repo: CompanyReportRepository) {}
 
-  @Get('last-month')
+  @Get('transfer-last-month')
   @HttpCode(200)
   @ApiOperation({
     summary: 'Companies with transfers in previous month (materialized view)',
@@ -22,7 +22,7 @@ export class ReportController {
       'List of companies with their transfer statistics for the previous month',
     type: [CompanyMonthlyDto],
   })
-  async lastMonth(): Promise<CompanyMonthlyDto[]> {
+  async transferLastMonth(): Promise<CompanyMonthlyDto[]> {
     return this.repo.lastMonth();
   }
 

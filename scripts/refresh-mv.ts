@@ -1,14 +1,30 @@
 // scripts/refresh-mv.ts
 
 import * as dotenv from 'dotenv';
-import { DataSource } from 'typeorm';
-import { getDatabaseConfig } from '../src/infrastructure/database/database.config';
+import { DataSource, DataSourceOptions } from 'typeorm';
+import { CompanyEntity } from '../src/infrastructure/database/entities/company.entity';
+import { TransferEntity } from '../src/infrastructure/database/entities/transfer.entity';
 
 // Load environment variables
 dotenv.config();
 
 async function refreshMaterializedViews() {
-  const dataSource = new DataSource(getDatabaseConfig());
+  const isLocal = process.env.NODE_ENV === 'local' || !process.env.DATABASE_HOST;
+
+  const dataSourceOptions: DataSourceOptions = {
+    type: 'postgres',
+    host: process.env.DATABASE_HOST || 'localhost',
+    port: parseInt(process.env.DATABASE_PORT) || 5432,
+    username: process.env.DATABASE_USERNAME || 'sooft_user',
+    password: process.env.DATABASE_PASSWORD || 'sooft_password',
+    database: process.env.DATABASE_NAME || 'sooft_tech_db',
+    entities: [CompanyEntity, TransferEntity],
+    synchronize: false,
+    logging: process.env.NODE_ENV === 'local',
+    ssl: isLocal ? false : { rejectUnauthorized: false },
+  };
+
+  const dataSource = new DataSource(dataSourceOptions);
 
   try {
     console.log('Connecting to database...');

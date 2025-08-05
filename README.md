@@ -20,7 +20,7 @@ This project follows **Hexagonal Architecture (Ports & Adapters)** with Clean Co
    - `?joinedFrom=2023-12-01T00:00:00Z&joinedTo=2023-12-31T23:59:59Z` - Companies joined within date range
    - `?transferFrom=2023-11-01T00:00:00Z&transferTo=2023-11-30T23:59:59Z` - Companies with transfers within date range
    - All parameters can be combined and are optional (inclusive filtering)
-3. **GET /v1/reports/companies/last-month** - Fixed monthly report with transfer statistics (materialized view)
+3. **GET /v1/reports/companies/transfer-last-month** - Companies with transfers in the previous month (materialized view)
 4. **GET /v1/reports/companies/joined-last-month** - Companies that joined in the previous month (materialized view)
 
 ### Domain Models
@@ -175,9 +175,9 @@ curl -X GET "http://localhost:3000/v1/companies?transfersSince=2023-11-01T00:00:
 curl -X GET "http://localhost:3000/v1/companies?joinedAfter=2023-12-01T00:00:00Z&transfersSince=2023-11-01T00:00:00Z"
 ```
 
-### Get Last Month Companies Report
+### Get Companies Transfer Report (Last Month)
 ```bash
-curl -X GET "http://localhost:3000/v1/reports/companies/last-month"
+curl -X GET "http://localhost:3000/v1/reports/companies/transfer-last-month"
 ```
 
 **Response Format (200):**
@@ -195,7 +195,7 @@ curl -X GET "http://localhost:3000/v1/reports/companies/last-month"
 ]
 ```
 
-### Get Companies Joined Last Month Report
+### Get Companies Joined Report (Last Month)
 ```bash
 curl -X GET "http://localhost:3000/v1/reports/companies/joined-last-month"
 ```
