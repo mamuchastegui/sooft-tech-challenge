@@ -18,13 +18,20 @@
 
 ## REST API Design Decisions
 
-### Query Parameter Implementation
-- **Why Query Parameters**: Query parameters are preferred over path segments for filtering because:
-  1. **Extensibility**: New filters can be added without breaking existing API contracts
-  2. **Composability**: Multiple filters combine naturally with `&` syntax
-  3. **RESTful Design**: Follows REST conventions where path represents resource hierarchy and query parameters represent filtering/options
-  4. **HTTP Caching**: Query parameters enable better cache key generation for HTTP proxies and CDNs
-  5. **URL Semantics**: `/companies` represents the resource, query params represent how to filter that resource
+### Dynamic Date Range Filtering
+- **Why Date Ranges**: Date ranges (from/to) are preferred over single dates because:
+  1. **Flexibility**: Users can specify exact time periods without hardcoded logic
+  2. **Business Alignment**: Real business queries often need specific date ranges
+  3. **Scalability**: No need to update code for different time periods
+  4. **Query Efficiency**: Database can optimize range queries with proper indexing
+  5. **User Control**: Frontend applications can provide date pickers for precise filtering
+
+### Date Filtering Parameters
+- **joinedFrom/joinedTo**: Filter companies by their join date range (inclusive)
+- **transferFrom/transferTo**: Filter companies that have transfers within the specified date range
+- **Combined Logic**: All parameters work together with AND logic for precise filtering
+- **Optional Parameters**: All filters are optional - omit for broader results
+- **Range Flexibility**: Can specify only 'from' or only 'to' for open-ended ranges
 
 ### Date Filtering Logic
 - **Inclusive Comparison**: All date filters use `>=` (greater than or equal) comparison for intuitive behavior

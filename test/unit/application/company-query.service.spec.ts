@@ -19,8 +19,6 @@ describe('CompanyQueryService', () => {
       findById: jest.fn(),
       findByCuit: jest.fn(),
       findAll: jest.fn(),
-      findCompaniesJoinedInLastMonth: jest.fn(),
-      findCompaniesWithTransfersInLastMonth: jest.fn(),
       findCompaniesByFilter: jest.fn(),
     };
 
@@ -86,12 +84,12 @@ describe('CompanyQueryService', () => {
       mockRepository.findCompaniesByFilter.mockResolvedValue(companies);
 
       const result = await service.findCompanies({
-        joinedAfter: '2023-12-01T00:00:00Z',
+        joinedFrom: '2023-12-01T00:00:00Z',
       });
 
       expect(mockDateProvider.parseISO).toHaveBeenCalledWith('2023-12-01T00:00:00Z');
       expect(mockRepository.findCompaniesByFilter).toHaveBeenCalledWith({
-        joinedAfter: filterDate,
+        joinedFrom: filterDate,
       });
       expect(result).toHaveLength(1);
     });
@@ -112,12 +110,12 @@ describe('CompanyQueryService', () => {
       mockRepository.findCompaniesByFilter.mockResolvedValue(companies);
 
       const result = await service.findCompanies({
-        transfersSince: '2023-11-01T00:00:00Z',
+        transferFrom: '2023-11-01T00:00:00Z',
       });
 
       expect(mockDateProvider.parseISO).toHaveBeenCalledWith('2023-11-01T00:00:00Z');
       expect(mockRepository.findCompaniesByFilter).toHaveBeenCalledWith({
-        transfersSince: filterDate,
+        transferFrom: filterDate,
       });
       expect(result).toHaveLength(1);
     });
@@ -141,49 +139,16 @@ describe('CompanyQueryService', () => {
       mockRepository.findCompaniesByFilter.mockResolvedValue(companies);
 
       const result = await service.findCompanies({
-        joinedAfter: '2023-12-01T00:00:00Z',
-        transfersSince: '2023-11-01T00:00:00Z',
+        joinedFrom: '2023-12-01T00:00:00Z',
+        transferFrom: '2023-11-01T00:00:00Z',
       });
 
       expect(mockRepository.findCompaniesByFilter).toHaveBeenCalledWith({
-        joinedAfter: joinedDate,
-        transfersSince: transferDate,
+        joinedFrom: joinedDate,
+        transferFrom: transferDate,
       });
       expect(result).toHaveLength(1);
     });
   });
 
-  describe('getCompaniesJoinedInLastMonth', () => {
-    it('should delegate to findCompanies with calculated date', async () => {
-      const now = new Date('2023-12-15T10:00:00Z');
-      const expectedDate = new Date('2023-11-15T10:00:00Z');
-      
-      mockDateProvider.now.mockReturnValue(now);
-      mockDateProvider.parseISO.mockReturnValue(expectedDate);
-      mockRepository.findCompaniesByFilter.mockResolvedValue([]);
-
-      await service.getCompaniesJoinedInLastMonth();
-
-      expect(mockDateProvider.now).toHaveBeenCalled();
-      expect(mockDateProvider.parseISO).toHaveBeenCalled();
-      expect(mockRepository.findCompaniesByFilter).toHaveBeenCalled();
-    });
-  });
-
-  describe('getCompaniesWithTransfersInLastMonth', () => {
-    it('should delegate to findCompanies with calculated date', async () => {
-      const now = new Date('2023-12-15T10:00:00Z');
-      const expectedDate = new Date('2023-11-15T10:00:00Z');
-      
-      mockDateProvider.now.mockReturnValue(now);
-      mockDateProvider.parseISO.mockReturnValue(expectedDate);
-      mockRepository.findCompaniesByFilter.mockResolvedValue([]);
-
-      await service.getCompaniesWithTransfersInLastMonth();
-
-      expect(mockDateProvider.now).toHaveBeenCalled();
-      expect(mockDateProvider.parseISO).toHaveBeenCalled();
-      expect(mockRepository.findCompaniesByFilter).toHaveBeenCalled();
-    });
-  });
 });

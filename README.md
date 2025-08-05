@@ -1,14 +1,14 @@
 # SOOFT Technology Backend Challenge
 
-A NestJS backend application implementing hexagonal architecture for company management and transfer tracking with RESTful query parameter filtering.
+A NestJS backend application implementing hexagonal architecture for company management and transfer tracking with PostgreSQL database and dynamic date range filtering.
 
 ## Architecture
 
 This project follows **Hexagonal Architecture (Ports & Adapters)** with Clean Code principles:
 
 - **Domain Layer**: Core business logic, entities, and repository interfaces
-- **Application Layer**: Use cases, services, and DTOs with query filtering
-- **Infrastructure Layer**: Database adapters, external integrations, and date providers
+- **Application Layer**: Use cases, services, and DTOs with dynamic query filtering
+- **Infrastructure Layer**: PostgreSQL database adapters, TypeORM entities, and date providers
 - **Presentation Layer**: REST API controllers with OpenAPI documentation
 
 ## Features
@@ -16,10 +16,10 @@ This project follows **Hexagonal Architecture (Ports & Adapters)** with Clean Co
 ### Core Endpoints
 
 1. **POST /v1/companies** - Register new company adhesion
-2. **GET /v1/companies** - Get companies with optional date filters:
-   - `?joinedAfter=2023-12-01T00:00:00Z` - Companies joined after date (inclusive)
-   - `?transfersSince=2023-11-01T00:00:00Z` - Companies with transfers since date (inclusive)
-   - Both parameters can be combined for AND logic
+2. **GET /v1/companies** - Get companies with optional date range filters:
+   - `?joinedFrom=2023-12-01T00:00:00Z&joinedTo=2023-12-31T23:59:59Z` - Companies joined within date range
+   - `?transferFrom=2023-11-01T00:00:00Z&transferTo=2023-11-30T23:59:59Z` - Companies with transfers within date range
+   - All parameters can be combined and are optional (inclusive filtering)
 
 ### Domain Models
 
@@ -30,27 +30,80 @@ This project follows **Hexagonal Architecture (Ports & Adapters)** with Clean Co
 
 - **Framework**: NestJS 10+
 - **Language**: TypeScript
+- **Database**: PostgreSQL (Amazon RDS free-tier in production, Docker locally)
+- **ORM**: TypeORM with entities and query builder
 - **Validation**: class-validator, class-transformer
 - **Documentation**: OpenAPI/Swagger 7.x
 - **Testing**: Jest (unit + e2e tests)
 - **Architecture**: Hexagonal (Ports & Adapters)
-- **Persistence**: In-memory with mock data
 - **Code Quality**: ESLint + Prettier
 
-## Installation & Setup
+## Local Development Setup
+
+### Prerequisites
+- Node.js 18+
+- Docker and Docker Compose
+- npm
+
+### Quick Start
 
 ```bash
-# Install dependencies
+# Clone and install dependencies
 npm install
 
-# Copy environment variables
+# Copy environment configuration
 cp .env.example .env
+
+# Start local PostgreSQL database
+docker compose up -d postgres
+
+# Wait for database to be ready, then seed data
+npm run db:seed
 
 # Start development server
 npm run start:dev
 ```
 
 The application will be available at `http://localhost:3000`
+
+### Database Management
+
+```bash
+# Start PostgreSQL container
+docker compose up -d postgres
+
+# Seed database with sample data
+npm run db:seed
+
+# View database logs
+docker compose logs postgres
+
+# Stop and remove containers
+docker compose down
+```
+
+## Production (Amazon RDS) Setup
+
+The application is designed to work with Amazon RDS PostgreSQL free-tier in production:
+
+1. **Create RDS Instance**: Use PostgreSQL free-tier instance
+2. **Configure Environment**: Set RDS connection details in environment variables:
+   ```bash
+   DATABASE_HOST=your-rds-endpoint.amazonaws.com
+   DATABASE_USERNAME=your_username
+   DATABASE_PASSWORD=your_password
+   DATABASE_NAME=your_database
+   ```
+3. **Deploy**: The application automatically detects RDS vs local configuration
+
+## Scalability Roadmap
+
+See [ASSUMPTIONS.md](./ASSUMPTIONS.md#scalability-roadmap) for detailed scalability plans:
+
+- **Scale-up**: Bigger RDS instances for increased throughput
+- **Scale-out**: Read replicas + optional manual sharding  
+- **Aurora Migration**: Seamless upgrade to Aurora PostgreSQL Serverless v2
+- **Specialized Storage**: DynamoDB for ultra-low-latency hot paths
 
 ## NPM Scripts
 

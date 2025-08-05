@@ -44,35 +44,6 @@ export class CompanyService {
     );
   }
 
-  async getCompaniesJoinedInLastMonth(): Promise<CompanyResponseDto[]> {
-    const companies = await this.companyRepository.findCompaniesJoinedInLastMonth();
-    
-    return companies.map(company => {
-      const plainObject = company.toPlainObject();
-      return new CompanyResponseDto(
-        plainObject.id,
-        plainObject.cuit,
-        plainObject.businessName,
-        plainObject.joinedAt,
-        plainObject.type,
-      );
-    });
-  }
-
-  async getCompaniesWithTransfersInLastMonth(): Promise<CompanyResponseDto[]> {
-    const companies = await this.companyRepository.findCompaniesWithTransfersInLastMonth();
-    
-    return companies.map(company => {
-      const plainObject = company.toPlainObject();
-      return new CompanyResponseDto(
-        plainObject.id,
-        plainObject.cuit,
-        plainObject.businessName,
-        plainObject.joinedAt,
-        plainObject.type,
-      );
-    });
-  }
 
   async getCompanyById(id: string): Promise<CompanyResponseDto> {
     const company = await this.companyRepository.findById(id);

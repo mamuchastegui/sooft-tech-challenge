@@ -1,34 +1,47 @@
 // src/infrastructure/repositories/transfer.repository.impl.ts
 
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { Transfer } from '../../domain/entities/transfer.entity';
 import { TransferRepository } from '../../domain/repositories/transfer.repository.interface';
-import { MockData } from '../database/mock-data';
+import { TransferEntity } from '../database/entities/transfer.entity';
 
 @Injectable()
 export class TransferRepositoryImpl implements TransferRepository {
+  constructor(
+    @InjectRepository(TransferEntity)
+    private readonly transferEntityRepository: Repository<TransferEntity>,
+  ) {}
+
   async save(transfer: Transfer): Promise<Transfer> {
-    MockData.addTransfer(transfer);
-    return transfer;
+    const plainObject = transfer.toPlainObject();
+    const transferEntity = this.transferEntityRepository.create({
+      id: plainObject.id,
+      amount: plainObject.amount,
+      companyId: plainObject.companyId,
+      debitAccount: plainObject.debitAccount,
+      creditAccount: plainObject.creditAccount,
+      createdAt: plainObject.createdAt,
+    });
+
+    const savedEntity = await this.transferEntityRepository.save(transferEntity);
+    return this.entityToDomain(savedEntity);
   }
 
   async findById(id: string): Promise<Transfer | null> {
-    const transfers = MockData.getTransfers();
-    return transfers.find(transfer => transfer.id === id) || null;
+    const entity = await this.transferEntityRepository.findOne({ where: { id } });
+    return entity ? this.entityToDomain(entity) : null;
   }
 
   async findByCompanyId(companyId: string): Promise<Transfer[]> {
-    const transfers = MockData.getTransfers();
-    return transfers.filter(transfer => transfer.companyId === companyId);
+    const entities = await this.transferEntityRepository.find({ where: { companyId } });
+    return entities.map(entity => this.entityToDomain(entity));
   }
 
   async findAll(): Promise<Transfer[]> {
-    return MockData.getTransfers();
-  }
-
-  async findTransfersInLastMonth(): Promise<Transfer[]> {
-    const transfers = MockData.getTransfers();
-    return transfers.filter(transfer => transfer.isCreatedInLastMonth());
+    const entities = await this.transferEntityRepository.find();
+    return entities.map(entity => this.entityToDomain(entity));
   }
 
   async findTransfersByCompanyIdAndDateRange(
@@ -36,12 +49,24 @@ export class TransferRepositoryImpl implements TransferRepository {
     startDate: Date,
     endDate: Date,
   ): Promise<Transfer[]> {
-    const transfers = MockData.getTransfers();
-    return transfers.filter(
-      transfer =>
-        transfer.companyId === companyId &&
-        transfer.createdAt >= startDate &&
-        transfer.createdAt <= endDate,
+    const entities = await this.transferEntityRepository
+      .createQueryBuilder('transfer')
+      .where('transfer.companyId = :companyId', { companyId })
+      .andWhere('transfer.createdAt >= :startDate', { startDate })
+      .andWhere('transfer.createdAt <= :endDate', { endDate })
+      .getMany();
+
+    return entities.map(entity => this.entityToDomain(entity));
+  }
+
+  private entityToDomain(entity: TransferEntity): Transfer {
+    return new Transfer(
+      entity.id,
+      entity.amount,
+      entity.companyId,
+      entity.debitAccount,
+      entity.creditAccount,
+      entity.createdAt,
     );
   }
 }

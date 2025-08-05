@@ -30,11 +30,6 @@ export class Company {
     }
   }
 
-  public isJoinedInLastMonth(): boolean {
-    const oneMonthAgo = new Date();
-    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-    return this.joinedAt >= oneMonthAgo;
-  }
 
   public toPlainObject() {
     return {

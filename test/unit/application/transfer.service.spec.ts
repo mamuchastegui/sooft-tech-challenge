@@ -17,7 +17,6 @@ describe('TransferService', () => {
       findById: jest.fn(),
       findByCompanyId: jest.fn(),
       findAll: jest.fn(),
-      findTransfersInLastMonth: jest.fn(),
       findTransfersByCompanyIdAndDateRange: jest.fn(),
     };
 
@@ -35,37 +34,6 @@ describe('TransferService', () => {
     mockRepository = module.get(TRANSFER_REPOSITORY_TOKEN);
   });
 
-  describe('getTransfersInLastMonth', () => {
-    it('should return transfers from last month', async () => {
-      const transfers = [
-        new Transfer(
-          '1',
-          1000.50,
-          'company-1',
-          '001-123456-01',
-          '002-654321-02',
-          new Date(),
-        ),
-        new Transfer(
-          '2',
-          2500.75,
-          'company-2',
-          '003-789012-03',
-          '004-345678-04',
-          new Date(),
-        ),
-      ];
-
-      mockRepository.findTransfersInLastMonth.mockResolvedValue(transfers);
-
-      const result = await service.getTransfersInLastMonth();
-
-      expect(mockRepository.findTransfersInLastMonth).toHaveBeenCalled();
-      expect(result).toHaveLength(2);
-      expect(result[0].amount).toBe(1000.50);
-      expect(result[1].amount).toBe(2500.75);
-    });
-  });
 
   describe('getTransfersByCompanyId', () => {
     it('should return transfers for specific company', async () => {

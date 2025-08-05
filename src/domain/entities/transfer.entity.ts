@@ -40,11 +40,6 @@ export class Transfer {
     }
   }
 
-  public isCreatedInLastMonth(): boolean {
-    const oneMonthAgo = new Date();
-    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-    return this.createdAt >= oneMonthAgo;
-  }
 
   public toPlainObject() {
     return {

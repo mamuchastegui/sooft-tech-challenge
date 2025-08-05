@@ -13,21 +13,6 @@ export class TransferService {
     private readonly transferRepository: TransferRepository,
   ) {}
 
-  async getTransfersInLastMonth(): Promise<TransferResponseDto[]> {
-    const transfers = await this.transferRepository.findTransfersInLastMonth();
-    
-    return transfers.map(transfer => {
-      const plainObject = transfer.toPlainObject();
-      return new TransferResponseDto(
-        plainObject.id,
-        plainObject.amount,
-        plainObject.companyId,
-        plainObject.debitAccount,
-        plainObject.creditAccount,
-        plainObject.createdAt,
-      );
-    });
-  }
 
   async getTransfersByCompanyId(companyId: string): Promise<TransferResponseDto[]> {
     const transfers = await this.transferRepository.findByCompanyId(companyId);

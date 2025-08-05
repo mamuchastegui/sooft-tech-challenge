@@ -8,7 +8,5 @@ export interface CompanyRepository {
   findById(id: string): Promise<Company | null>;
   findByCuit(cuit: string): Promise<Company | null>;
   findAll(): Promise<Company[]>;
-  findCompaniesJoinedInLastMonth(): Promise<Company[]>;
-  findCompaniesWithTransfersInLastMonth(): Promise<Company[]>;
   findCompaniesByFilter(filter: CompanyFilter): Promise<Company[]>;
 }

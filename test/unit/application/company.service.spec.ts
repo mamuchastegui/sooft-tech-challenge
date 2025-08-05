@@ -19,8 +19,7 @@ describe('CompanyService', () => {
       findById: jest.fn(),
       findByCuit: jest.fn(),
       findAll: jest.fn(),
-      findCompaniesJoinedInLastMonth: jest.fn(),
-      findCompaniesWithTransfersInLastMonth: jest.fn(),
+      findCompaniesByFilter: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -84,57 +83,6 @@ describe('CompanyService', () => {
     });
   });
 
-  describe('getCompaniesJoinedInLastMonth', () => {
-    it('should return companies joined in last month', async () => {
-      const companies = [
-        new Company(
-          '1',
-          '20-12345678-9',
-          'Company 1',
-          new Date(),
-          new CompanyTypeVO(CompanyType.CORPORATE),
-        ),
-        new Company(
-          '2',
-          '27-87654321-0',
-          'Company 2',
-          new Date(),
-          new CompanyTypeVO(CompanyType.PYME),
-        ),
-      ];
-
-      mockRepository.findCompaniesJoinedInLastMonth.mockResolvedValue(companies);
-
-      const result = await service.getCompaniesJoinedInLastMonth();
-
-      expect(mockRepository.findCompaniesJoinedInLastMonth).toHaveBeenCalled();
-      expect(result).toHaveLength(2);
-      expect(result[0].businessName).toBe('Company 1');
-      expect(result[1].businessName).toBe('Company 2');
-    });
-  });
-
-  describe('getCompaniesWithTransfersInLastMonth', () => {
-    it('should return companies with transfers in last month', async () => {
-      const companies = [
-        new Company(
-          '1',
-          '20-12345678-9',
-          'Company 1',
-          new Date(),
-          new CompanyTypeVO(CompanyType.CORPORATE),
-        ),
-      ];
-
-      mockRepository.findCompaniesWithTransfersInLastMonth.mockResolvedValue(companies);
-
-      const result = await service.getCompaniesWithTransfersInLastMonth();
-
-      expect(mockRepository.findCompaniesWithTransfersInLastMonth).toHaveBeenCalled();
-      expect(result).toHaveLength(1);
-      expect(result[0].businessName).toBe('Company 1');
-    });
-  });
 
   describe('getCompanyById', () => {
     it('should return company when found', async () => {

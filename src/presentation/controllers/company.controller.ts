@@ -54,16 +54,28 @@ export class CompanyController {
     description: 'Retrieve companies based on optional date filters. If no filters are provided, returns all companies.'
   })
   @ApiQuery({
-    name: 'joinedAfter',
+    name: 'joinedFrom',
     required: false,
     description: 'Filter companies joined after this date (inclusive). ISO-8601 format.',
     example: '2023-12-01T00:00:00Z',
   })
   @ApiQuery({
-    name: 'transfersSince',
+    name: 'joinedTo',
     required: false,
-    description: 'Filter companies that have transfers since this date (inclusive). ISO-8601 format.',
+    description: 'Filter companies joined before this date (inclusive). ISO-8601 format.',
+    example: '2023-12-31T23:59:59Z',
+  })
+  @ApiQuery({
+    name: 'transferFrom',
+    required: false,
+    description: 'Filter companies that have transfers from this date (inclusive). ISO-8601 format.',
     example: '2023-11-01T00:00:00Z',
+  })
+  @ApiQuery({
+    name: 'transferTo',
+    required: false,
+    description: 'Filter companies that have transfers until this date (inclusive). ISO-8601 format.',
+    example: '2023-11-30T23:59:59Z',
   })
   @ApiResponse({
     status: 200,

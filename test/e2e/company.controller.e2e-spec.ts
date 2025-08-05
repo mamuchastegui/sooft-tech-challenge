@@ -4,12 +4,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../../src/app.module';
-import { DatabaseService } from '../../src/infrastructure/database/database.service';
 import { CompanyType } from '../../src/domain/value-objects/company-type.value-object';
 
 describe('CompanyController (e2e)', () => {
   let app: INestApplication;
-  let databaseService: DatabaseService;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -25,14 +23,11 @@ describe('CompanyController (e2e)', () => {
         forbidNonWhitelisted: true,
       }),
     );
-
-    databaseService = moduleFixture.get<DatabaseService>(DatabaseService);
     
     await app.init();
   });
 
   afterEach(async () => {
-    databaseService.reset();
     await app.close();
   });
 
@@ -132,13 +127,13 @@ describe('CompanyController (e2e)', () => {
         });
     });
 
-    it('should filter companies by joinedAfter parameter', () => {
+    it('should filter companies by joinedFrom parameter', () => {
       const filterDate = new Date();
       filterDate.setDate(filterDate.getDate() - 10); // 10 days ago
       
       return request(app.getHttpServer())
         .get('/v1/companies')
-        .query({ joinedAfter: filterDate.toISOString() })
+        .query({ joinedFrom: filterDate.toISOString() })
         .expect(200)
         .expect((res) => {
           expect(Array.isArray(res.body)).toBe(true);
@@ -150,13 +145,13 @@ describe('CompanyController (e2e)', () => {
         });
     });
 
-    it('should filter companies by transfersSince parameter', () => {
+    it('should filter companies by transferFrom parameter', () => {
       const filterDate = new Date();
       filterDate.setDate(filterDate.getDate() - 15); // 15 days ago
       
       return request(app.getHttpServer())
         .get('/v1/companies')
-        .query({ transfersSince: filterDate.toISOString() })
+        .query({ transferFrom: filterDate.toISOString() })
         .expect(200)
         .expect((res) => {
           expect(Array.isArray(res.body)).toBe(true);
@@ -164,7 +159,7 @@ describe('CompanyController (e2e)', () => {
         });
     });
 
-    it('should apply both joinedAfter and transfersSince filters', () => {
+    it('should apply both joinedFrom and transferFrom filters', () => {
       const joinedDate = new Date();
       joinedDate.setDate(joinedDate.getDate() - 20); // 20 days ago
       
@@ -174,8 +169,8 @@ describe('CompanyController (e2e)', () => {
       return request(app.getHttpServer())
         .get('/v1/companies')
         .query({ 
-          joinedAfter: joinedDate.toISOString(),
-          transfersSince: transferDate.toISOString()
+          joinedFrom: joinedDate.toISOString(),
+          transferFrom: transferDate.toISOString()
         })
         .expect(200)
         .expect((res) => {
@@ -183,23 +178,23 @@ describe('CompanyController (e2e)', () => {
         });
     });
 
-    it('should return 400 for invalid date format in joinedAfter', () => {
+    it('should return 400 for invalid date format in joinedFrom', () => {
       return request(app.getHttpServer())
         .get('/v1/companies')
-        .query({ joinedAfter: 'invalid-date' })
+        .query({ joinedFrom: 'invalid-date' })
         .expect(400)
         .expect((res) => {
-          expect(res.body.message).toContain('joinedAfter must be a valid ISO-8601 date string');
+          expect(res.body.message).toContain('joinedFrom must be a valid ISO-8601 date string');
         });
     });
 
-    it('should return 400 for invalid date format in transfersSince', () => {
+    it('should return 400 for invalid date format in transferFrom', () => {
       return request(app.getHttpServer())
         .get('/v1/companies')
-        .query({ transfersSince: 'invalid-date' })
+        .query({ transferFrom: 'invalid-date' })
         .expect(400)
         .expect((res) => {
-          expect(res.body.message).toContain('transfersSince must be a valid ISO-8601 date string');
+          expect(res.body.message).toContain('transferFrom must be a valid ISO-8601 date string');
         });
     });
 
@@ -209,7 +204,7 @@ describe('CompanyController (e2e)', () => {
       
       return request(app.getHttpServer())
         .get('/v1/companies')
-        .query({ joinedAfter: futureDate.toISOString() })
+        .query({ joinedFrom: futureDate.toISOString() })
         .expect(200)
         .expect((res) => {
           expect(Array.isArray(res.body)).toBe(true);
@@ -224,8 +219,8 @@ describe('CompanyController (e2e)', () => {
       return request(app.getHttpServer())
         .get('/v1/companies')
         .query({ 
-          joinedAfter: filterDate.toISOString(),
-          transfersSince: '' // Empty parameter should be ignored
+          joinedFrom: filterDate.toISOString(),
+          transferFrom: '' // Empty parameter should be ignored
         })
         .expect(200)
         .expect((res) => {

@@ -103,39 +103,6 @@ describe('Transfer Entity', () => {
     });
   });
 
-  describe('isCreatedInLastMonth', () => {
-    it('should return true for transfer created within last month', () => {
-      const twoWeeksAgo = new Date();
-      twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
-      
-      const transfer = new Transfer(
-        '1',
-        1000,
-        'company-1',
-        '001-123456-01',
-        '002-654321-02',
-        twoWeeksAgo,
-      );
-
-      expect(transfer.isCreatedInLastMonth()).toBe(true);
-    });
-
-    it('should return false for transfer created more than a month ago', () => {
-      const twoMonthsAgo = new Date();
-      twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2);
-      
-      const transfer = new Transfer(
-        '1',
-        1000,
-        'company-1',
-        '001-123456-01',
-        '002-654321-02',
-        twoMonthsAgo,
-      );
-
-      expect(transfer.isCreatedInLastMonth()).toBe(false);
-    });
-  });
 
   describe('toPlainObject', () => {
     it('should return plain object representation', () => {

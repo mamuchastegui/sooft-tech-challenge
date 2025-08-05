@@ -1,82 +1,93 @@
 // src/infrastructure/repositories/company.repository.impl.ts
 
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { Company } from '../../domain/entities/company.entity';
 import { CompanyRepository } from '../../domain/repositories/company.repository.interface';
 import { CompanyFilter } from '../../application/services/company-query.service';
-import { MockData } from '../database/mock-data';
+import { CompanyEntity } from '../database/entities/company.entity';
+import { TransferEntity } from '../database/entities/transfer.entity';
+import { CompanyTypeVO } from '../../domain/value-objects/company-type.value-object';
 
 @Injectable()
 export class CompanyRepositoryImpl implements CompanyRepository {
+  constructor(
+    @InjectRepository(CompanyEntity)
+    private readonly companyEntityRepository: Repository<CompanyEntity>,
+    @InjectRepository(TransferEntity)
+    private readonly transferEntityRepository: Repository<TransferEntity>,
+  ) {}
+
   async save(company: Company): Promise<Company> {
-    MockData.addCompany(company);
-    return company;
+    const plainObject = company.toPlainObject();
+    const companyEntity = this.companyEntityRepository.create({
+      id: plainObject.id,
+      cuit: plainObject.cuit,
+      businessName: plainObject.businessName,
+      joinedAt: plainObject.joinedAt,
+      type: plainObject.type,
+    });
+
+    const savedEntity = await this.companyEntityRepository.save(companyEntity);
+    return this.entityToDomain(savedEntity);
   }
 
   async findById(id: string): Promise<Company | null> {
-    const companies = MockData.getCompanies();
-    return companies.find(company => company.id === id) || null;
+    const entity = await this.companyEntityRepository.findOne({ where: { id } });
+    return entity ? this.entityToDomain(entity) : null;
   }
 
   async findByCuit(cuit: string): Promise<Company | null> {
-    const companies = MockData.getCompanies();
-    return companies.find(company => company.cuit === cuit) || null;
+    const entity = await this.companyEntityRepository.findOne({ where: { cuit } });
+    return entity ? this.entityToDomain(entity) : null;
   }
 
   async findAll(): Promise<Company[]> {
-    return MockData.getCompanies();
+    const entities = await this.companyEntityRepository.find();
+    return entities.map(entity => this.entityToDomain(entity));
   }
 
-  async findCompaniesJoinedInLastMonth(): Promise<Company[]> {
-    const companies = MockData.getCompanies();
-    return companies.filter(company => company.isJoinedInLastMonth());
-  }
-
-  async findCompaniesWithTransfersInLastMonth(): Promise<Company[]> {
-    const companies = MockData.getCompanies();
-    const transfers = MockData.getTransfers();
-    const oneMonthAgo = new Date();
-    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-
-    const recentTransfers = transfers.filter(transfer => transfer.isCreatedInLastMonth());
-    const companyIdsWithRecentTransfers = new Set(
-      recentTransfers.map(transfer => transfer.companyId)
-    );
-
-    return companies.filter(company => 
-      companyIdsWithRecentTransfers.has(company.id)
-    );
-  }
 
   async findCompaniesByFilter(filter: CompanyFilter): Promise<Company[]> {
-    const companies = MockData.getCompanies();
-    const transfers = MockData.getTransfers();
+    const queryBuilder = this.companyEntityRepository.createQueryBuilder('company');
 
-    let filteredCompanies = companies;
-
-    if (filter.joinedAfter) {
-      filteredCompanies = filteredCompanies.filter(company => 
-        company.joinedAt >= filter.joinedAfter!
-      );
+    if (filter.joinedFrom || filter.joinedTo) {
+      if (filter.joinedFrom) {
+        queryBuilder.andWhere('company.joinedAt >= :joinedFrom', { joinedFrom: filter.joinedFrom });
+      }
+      if (filter.joinedTo) {
+        queryBuilder.andWhere('company.joinedAt <= :joinedTo', { joinedTo: filter.joinedTo });
+      }
     }
 
-    if (filter.transfersSince) {
-      const recentTransfers = transfers.filter(transfer => 
-        transfer.createdAt >= filter.transfersSince!
-      );
-      const companyIdsWithRecentTransfers = new Set(
-        recentTransfers.map(transfer => transfer.companyId)
-      );
-
-      filteredCompanies = filteredCompanies.filter(company => 
-        companyIdsWithRecentTransfers.has(company.id)
-      );
+    if (filter.transferFrom || filter.transferTo) {
+      queryBuilder.innerJoin('company.transfers', 'transfer');
+      
+      if (filter.transferFrom) {
+        queryBuilder.andWhere('transfer.createdAt >= :transferFrom', { transferFrom: filter.transferFrom });
+      }
+      if (filter.transferTo) {
+        queryBuilder.andWhere('transfer.createdAt <= :transferTo', { transferTo: filter.transferTo });
+      }
     }
 
-    if (!filter.joinedAfter && !filter.transfersSince) {
-      return companies;
+    // If no filters, return all companies
+    if (!filter.joinedFrom && !filter.joinedTo && !filter.transferFrom && !filter.transferTo) {
+      return this.findAll();
     }
 
-    return filteredCompanies;
+    const entities = await queryBuilder.getMany();
+    return entities.map(entity => this.entityToDomain(entity));
+  }
+
+  private entityToDomain(entity: CompanyEntity): Company {
+    return new Company(
+      entity.id,
+      entity.cuit,
+      entity.businessName,
+      entity.joinedAt,
+      new CompanyTypeVO(entity.type),
+    );
   }
 }

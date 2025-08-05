@@ -8,8 +8,10 @@ import { COMPANY_REPOSITORY_TOKEN } from '../../domain/repositories/company.repo
 import { DateProvider } from '../../infrastructure/providers/date.provider';
 
 export interface CompanyFilter {
-  joinedAfter?: Date;
-  transfersSince?: Date;
+  joinedFrom?: Date;
+  joinedTo?: Date;
+  transferFrom?: Date;
+  transferTo?: Date;
 }
 
 @Injectable()
@@ -23,12 +25,20 @@ export class CompanyQueryService {
   async findCompanies(queryDto: CompanyQueryDto): Promise<CompanyResponseDto[]> {
     const filter: CompanyFilter = {};
 
-    if (queryDto.joinedAfter) {
-      filter.joinedAfter = this.dateProvider.parseISO(queryDto.joinedAfter);
+    if (queryDto.joinedFrom) {
+      filter.joinedFrom = this.dateProvider.parseISO(queryDto.joinedFrom);
     }
 
-    if (queryDto.transfersSince) {
-      filter.transfersSince = this.dateProvider.parseISO(queryDto.transfersSince);
+    if (queryDto.joinedTo) {
+      filter.joinedTo = this.dateProvider.parseISO(queryDto.joinedTo);
+    }
+
+    if (queryDto.transferFrom) {
+      filter.transferFrom = this.dateProvider.parseISO(queryDto.transferFrom);
+    }
+
+    if (queryDto.transferTo) {
+      filter.transferTo = this.dateProvider.parseISO(queryDto.transferTo);
     }
 
     const companies = await this.companyRepository.findCompaniesByFilter(filter);
@@ -42,24 +52,6 @@ export class CompanyQueryService {
         plainObject.joinedAt,
         plainObject.type,
       );
-    });
-  }
-
-  async getCompaniesJoinedInLastMonth(): Promise<CompanyResponseDto[]> {
-    const oneMonthAgo = new Date(this.dateProvider.now());
-    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-    
-    return this.findCompanies({ 
-      joinedAfter: oneMonthAgo.toISOString() 
-    });
-  }
-
-  async getCompaniesWithTransfersInLastMonth(): Promise<CompanyResponseDto[]> {
-    const oneMonthAgo = new Date(this.dateProvider.now());
-    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-    
-    return this.findCompanies({ 
-      transfersSince: oneMonthAgo.toISOString() 
     });
   }
 }

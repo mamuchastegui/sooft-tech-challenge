@@ -50,39 +50,6 @@ describe('Company Entity', () => {
     });
   });
 
-  describe('isJoinedInLastMonth', () => {
-    it('should return true for company joined within last month', () => {
-      const companyType = new CompanyTypeVO(CompanyType.CORPORATE);
-      const twoWeeksAgo = new Date();
-      twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
-      
-      const company = new Company(
-        '1',
-        '20-12345678-9',
-        'Test Company',
-        twoWeeksAgo,
-        companyType,
-      );
-
-      expect(company.isJoinedInLastMonth()).toBe(true);
-    });
-
-    it('should return false for company joined more than a month ago', () => {
-      const companyType = new CompanyTypeVO(CompanyType.CORPORATE);
-      const twoMonthsAgo = new Date();
-      twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2);
-      
-      const company = new Company(
-        '1',
-        '20-12345678-9',
-        'Test Company',
-        twoMonthsAgo,
-        companyType,
-      );
-
-      expect(company.isJoinedInLastMonth()).toBe(false);
-    });
-  });
 
   describe('toPlainObject', () => {
     it('should return plain object representation', () => {

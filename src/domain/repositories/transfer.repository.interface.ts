@@ -7,7 +7,6 @@ export interface TransferRepository {
   findById(id: string): Promise<Transfer | null>;
   findByCompanyId(companyId: string): Promise<Transfer[]>;
   findAll(): Promise<Transfer[]>;
-  findTransfersInLastMonth(): Promise<Transfer[]>;
   findTransfersByCompanyIdAndDateRange(
     companyId: string,
     startDate: Date,
