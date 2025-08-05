@@ -1,6 +1,12 @@
 // src/infrastructure/database/entities/company.entity.ts
 
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  CreateDateColumn,
+} from 'typeorm';
 import { TransferEntity } from './transfer.entity';
 
 @Entity('companies')
@@ -23,6 +29,6 @@ export class CompanyEntity {
   })
   type: 'PYME' | 'CORPORATE';
 
-  @OneToMany(() => TransferEntity, transfer => transfer.company)
+  @OneToMany(() => TransferEntity, (transfer) => transfer.company)
   transfers: TransferEntity[];
 }

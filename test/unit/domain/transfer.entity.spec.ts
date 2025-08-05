@@ -6,10 +6,10 @@ describe('Transfer Entity', () => {
   describe('constructor', () => {
     it('should create a valid transfer', () => {
       const createdAt = new Date();
-      
+
       const transfer = new Transfer(
         '1',
-        1000.50,
+        1000.5,
         'company-1',
         '001-123456-01',
         '002-654321-02',
@@ -17,7 +17,7 @@ describe('Transfer Entity', () => {
       );
 
       expect(transfer.id).toBe('1');
-      expect(transfer.amount).toBe(1000.50);
+      expect(transfer.amount).toBe(1000.5);
       expect(transfer.companyId).toBe('company-1');
       expect(transfer.debitAccount).toBe('001-123456-01');
       expect(transfer.creditAccount).toBe('002-654321-02');
@@ -103,14 +103,13 @@ describe('Transfer Entity', () => {
     });
   });
 
-
   describe('toPlainObject', () => {
     it('should return plain object representation', () => {
       const createdAt = new Date();
-      
+
       const transfer = new Transfer(
         '1',
-        1000.50,
+        1000.5,
         'company-1',
         '001-123456-01',
         '002-654321-02',
@@ -121,7 +120,7 @@ describe('Transfer Entity', () => {
 
       expect(plainObject).toEqual({
         id: '1',
-        amount: 1000.50,
+        amount: 1000.5,
         companyId: 'company-1',
         debitAccount: '001-123456-01',
         creditAccount: '002-654321-02',

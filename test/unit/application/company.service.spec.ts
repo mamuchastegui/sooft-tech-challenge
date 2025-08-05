@@ -5,7 +5,10 @@ import { ConflictException, NotFoundException } from '@nestjs/common';
 import { CompanyService } from '../../../src/application/services/company.service';
 import { CompanyRepository } from '../../../src/domain/repositories/company.repository.interface';
 import { Company } from '../../../src/domain/entities/company.entity';
-import { CompanyTypeVO, CompanyType } from '../../../src/domain/value-objects/company-type.value-object';
+import {
+  CompanyTypeVO,
+  CompanyType,
+} from '../../../src/domain/value-objects/company-type.value-object';
 import { CreateCompanyDto } from '../../../src/application/dto/create-company.dto';
 import { COMPANY_REPOSITORY_TOKEN } from '../../../src/domain/repositories/company.repository.token';
 
@@ -45,7 +48,7 @@ describe('CompanyService', () => {
 
     it('should create a new company successfully', async () => {
       mockRepository.findByCuit.mockResolvedValue(null);
-      
+
       const savedCompany = new Company(
         'generated-id',
         createCompanyDto.cuit,
@@ -53,12 +56,14 @@ describe('CompanyService', () => {
         new Date(),
         new CompanyTypeVO(createCompanyDto.type),
       );
-      
+
       mockRepository.save.mockResolvedValue(savedCompany);
 
       const result = await service.createCompany(createCompanyDto);
 
-      expect(mockRepository.findByCuit).toHaveBeenCalledWith(createCompanyDto.cuit);
+      expect(mockRepository.findByCuit).toHaveBeenCalledWith(
+        createCompanyDto.cuit,
+      );
       expect(mockRepository.save).toHaveBeenCalled();
       expect(result.cuit).toBe(createCompanyDto.cuit);
       expect(result.businessName).toBe(createCompanyDto.businessName);
@@ -73,7 +78,7 @@ describe('CompanyService', () => {
         new Date(),
         new CompanyTypeVO(CompanyType.PYME),
       );
-      
+
       mockRepository.findByCuit.mockResolvedValue(existingCompany);
 
       await expect(service.createCompany(createCompanyDto)).rejects.toThrow(
@@ -82,7 +87,6 @@ describe('CompanyService', () => {
       expect(mockRepository.save).not.toHaveBeenCalled();
     });
   });
-
 
   describe('getCompanyById', () => {
     it('should return company when found', async () => {

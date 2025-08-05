@@ -30,7 +30,6 @@ export class Company {
     }
   }
 
-
   public toPlainObject() {
     return {
       id: this.id,

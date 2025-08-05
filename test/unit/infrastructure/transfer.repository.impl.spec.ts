@@ -38,7 +38,7 @@ describe('TransferRepositoryImpl', () => {
     it('should save a transfer successfully', async () => {
       const transfer = new Transfer(
         '1',
-        1000.50,
+        1000.5,
         'company-1',
         '001-123456-01',
         '002-654321-02',
@@ -47,21 +47,25 @@ describe('TransferRepositoryImpl', () => {
 
       const transferEntity = {
         id: '1',
-        amount: 1000.50,
+        amount: 1000.5,
         companyId: 'company-1',
         debitAccount: '001-123456-01',
         creditAccount: '002-654321-02',
         createdAt: expect.any(Date),
       };
 
-      mockTransferRepository.create.mockReturnValue(transferEntity as TransferEntity);
-      mockTransferRepository.save.mockResolvedValue(transferEntity as TransferEntity);
+      mockTransferRepository.create.mockReturnValue(
+        transferEntity as TransferEntity,
+      );
+      mockTransferRepository.save.mockResolvedValue(
+        transferEntity as TransferEntity,
+      );
 
       const result = await repository.save(transfer);
 
       expect(mockTransferRepository.create).toHaveBeenCalledWith({
         id: '1',
-        amount: 1000.50,
+        amount: 1000.5,
         companyId: 'company-1',
         debitAccount: '001-123456-01',
         creditAccount: '002-654321-02',
@@ -76,18 +80,22 @@ describe('TransferRepositoryImpl', () => {
     it('should return a transfer when found', async () => {
       const transferEntity = {
         id: '1',
-        amount: 1000.50,
+        amount: 1000.5,
         companyId: 'company-1',
         debitAccount: '001-123456-01',
         creditAccount: '002-654321-02',
         createdAt: new Date(),
       };
 
-      mockTransferRepository.findOne.mockResolvedValue(transferEntity as TransferEntity);
+      mockTransferRepository.findOne.mockResolvedValue(
+        transferEntity as TransferEntity,
+      );
 
       const result = await repository.findById('1');
 
-      expect(mockTransferRepository.findOne).toHaveBeenCalledWith({ where: { id: '1' } });
+      expect(mockTransferRepository.findOne).toHaveBeenCalledWith({
+        where: { id: '1' },
+      });
       expect(result).toBeInstanceOf(Transfer);
       expect(result?.id).toBe('1');
     });
@@ -106,7 +114,7 @@ describe('TransferRepositoryImpl', () => {
       const transferEntities = [
         {
           id: '1',
-          amount: 1000.50,
+          amount: 1000.5,
           companyId: 'company-1',
           debitAccount: '001-123456-01',
           creditAccount: '002-654321-02',
@@ -114,11 +122,15 @@ describe('TransferRepositoryImpl', () => {
         },
       ];
 
-      mockTransferRepository.find.mockResolvedValue(transferEntities as TransferEntity[]);
+      mockTransferRepository.find.mockResolvedValue(
+        transferEntities as TransferEntity[],
+      );
 
       const result = await repository.findByCompanyId('company-1');
 
-      expect(mockTransferRepository.find).toHaveBeenCalledWith({ where: { companyId: 'company-1' } });
+      expect(mockTransferRepository.find).toHaveBeenCalledWith({
+        where: { companyId: 'company-1' },
+      });
       expect(result).toHaveLength(1);
       expect(result[0]).toBeInstanceOf(Transfer);
     });
@@ -129,7 +141,7 @@ describe('TransferRepositoryImpl', () => {
       const transferEntities = [
         {
           id: '1',
-          amount: 1000.50,
+          amount: 1000.5,
           companyId: 'company-1',
           debitAccount: '001-123456-01',
           creditAccount: '002-654321-02',
@@ -145,7 +157,9 @@ describe('TransferRepositoryImpl', () => {
         },
       ];
 
-      mockTransferRepository.find.mockResolvedValue(transferEntities as TransferEntity[]);
+      mockTransferRepository.find.mockResolvedValue(
+        transferEntities as TransferEntity[],
+      );
 
       const result = await repository.findAll();
 
@@ -160,7 +174,7 @@ describe('TransferRepositoryImpl', () => {
     it('should find transfers by company and date range', async () => {
       const startDate = new Date('2023-01-01');
       const endDate = new Date('2023-01-31');
-      
+
       const queryBuilder = {
         where: jest.fn().mockReturnThis(),
         andWhere: jest.fn().mockReturnThis(),
@@ -169,12 +183,27 @@ describe('TransferRepositoryImpl', () => {
 
       mockTransferRepository.createQueryBuilder.mockReturnValue(queryBuilder);
 
-      const result = await repository.findTransfersByCompanyIdAndDateRange('company-1', startDate, endDate);
+      const result = await repository.findTransfersByCompanyIdAndDateRange(
+        'company-1',
+        startDate,
+        endDate,
+      );
 
-      expect(mockTransferRepository.createQueryBuilder).toHaveBeenCalledWith('transfer');
-      expect(queryBuilder.where).toHaveBeenCalledWith('transfer.companyId = :companyId', { companyId: 'company-1' });
-      expect(queryBuilder.andWhere).toHaveBeenCalledWith('transfer.createdAt >= :startDate', { startDate });
-      expect(queryBuilder.andWhere).toHaveBeenCalledWith('transfer.createdAt <= :endDate', { endDate });
+      expect(mockTransferRepository.createQueryBuilder).toHaveBeenCalledWith(
+        'transfer',
+      );
+      expect(queryBuilder.where).toHaveBeenCalledWith(
+        'transfer.companyId = :companyId',
+        { companyId: 'company-1' },
+      );
+      expect(queryBuilder.andWhere).toHaveBeenCalledWith(
+        'transfer.createdAt >= :startDate',
+        { startDate },
+      );
+      expect(queryBuilder.andWhere).toHaveBeenCalledWith(
+        'transfer.createdAt <= :endDate',
+        { endDate },
+      );
       expect(result).toEqual([]);
     });
   });

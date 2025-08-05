@@ -1,6 +1,13 @@
 // src/infrastructure/database/entities/transfer.entity.ts
 
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  CreateDateColumn,
+} from 'typeorm';
 import { CompanyEntity } from './company.entity';
 
 @Entity('transfers')
@@ -23,7 +30,7 @@ export class TransferEntity {
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @ManyToOne(() => CompanyEntity, company => company.transfers)
+  @ManyToOne(() => CompanyEntity, (company) => company.transfers)
   @JoinColumn({ name: 'company_id' })
   company: CompanyEntity;
 }

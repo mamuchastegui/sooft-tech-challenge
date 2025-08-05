@@ -5,14 +5,16 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CompanyRepositoryImpl } from '../../../src/infrastructure/repositories/company.repository.impl';
 import { Company } from '../../../src/domain/entities/company.entity';
-import { CompanyTypeVO, CompanyType } from '../../../src/domain/value-objects/company-type.value-object';
+import {
+  CompanyTypeVO,
+  CompanyType,
+} from '../../../src/domain/value-objects/company-type.value-object';
 import { CompanyEntity } from '../../../src/infrastructure/database/entities/company.entity';
 import { TransferEntity } from '../../../src/infrastructure/database/entities/transfer.entity';
 
 describe('CompanyRepositoryImpl', () => {
   let repository: CompanyRepositoryImpl;
   let mockCompanyRepository: jest.Mocked<Repository<CompanyEntity>>;
-  let mockTransferRepository: jest.Mocked<Repository<TransferEntity>>;
 
   beforeEach(async () => {
     const mockCompanyRepo = {
@@ -44,7 +46,6 @@ describe('CompanyRepositoryImpl', () => {
 
     repository = module.get<CompanyRepositoryImpl>(CompanyRepositoryImpl);
     mockCompanyRepository = module.get(getRepositoryToken(CompanyEntity));
-    mockTransferRepository = module.get(getRepositoryToken(TransferEntity));
   });
 
   describe('save', () => {
@@ -65,8 +66,12 @@ describe('CompanyRepositoryImpl', () => {
         type: CompanyType.CORPORATE,
       };
 
-      mockCompanyRepository.create.mockReturnValue(companyEntity as CompanyEntity);
-      mockCompanyRepository.save.mockResolvedValue(companyEntity as CompanyEntity);
+      mockCompanyRepository.create.mockReturnValue(
+        companyEntity as CompanyEntity,
+      );
+      mockCompanyRepository.save.mockResolvedValue(
+        companyEntity as CompanyEntity,
+      );
 
       const result = await repository.save(company);
 
@@ -92,11 +97,15 @@ describe('CompanyRepositoryImpl', () => {
         type: CompanyType.CORPORATE,
       };
 
-      mockCompanyRepository.findOne.mockResolvedValue(companyEntity as CompanyEntity);
+      mockCompanyRepository.findOne.mockResolvedValue(
+        companyEntity as CompanyEntity,
+      );
 
       const result = await repository.findById('1');
 
-      expect(mockCompanyRepository.findOne).toHaveBeenCalledWith({ where: { id: '1' } });
+      expect(mockCompanyRepository.findOne).toHaveBeenCalledWith({
+        where: { id: '1' },
+      });
       expect(result).toBeInstanceOf(Company);
       expect(result?.id).toBe('1');
     });
@@ -120,11 +129,15 @@ describe('CompanyRepositoryImpl', () => {
         type: CompanyType.CORPORATE,
       };
 
-      mockCompanyRepository.findOne.mockResolvedValue(companyEntity as CompanyEntity);
+      mockCompanyRepository.findOne.mockResolvedValue(
+        companyEntity as CompanyEntity,
+      );
 
       const result = await repository.findByCuit('20-12345678-9');
 
-      expect(mockCompanyRepository.findOne).toHaveBeenCalledWith({ where: { cuit: '20-12345678-9' } });
+      expect(mockCompanyRepository.findOne).toHaveBeenCalledWith({
+        where: { cuit: '20-12345678-9' },
+      });
       expect(result).toBeInstanceOf(Company);
     });
   });
@@ -148,7 +161,9 @@ describe('CompanyRepositoryImpl', () => {
         },
       ];
 
-      mockCompanyRepository.find.mockResolvedValue(companyEntities as CompanyEntity[]);
+      mockCompanyRepository.find.mockResolvedValue(
+        companyEntities as CompanyEntity[],
+      );
 
       const result = await repository.findAll();
 
@@ -166,8 +181,11 @@ describe('CompanyRepositoryImpl', () => {
       };
 
       const queryBuilder = {
+        select: jest.fn().mockReturnThis(),
         andWhere: jest.fn().mockReturnThis(),
         innerJoin: jest.fn().mockReturnThis(),
+        take: jest.fn().mockReturnThis(),
+        getRawMany: jest.fn().mockResolvedValue([]),
         getMany: jest.fn().mockResolvedValue([]),
       } as any;
 
@@ -175,8 +193,12 @@ describe('CompanyRepositoryImpl', () => {
 
       const result = await repository.findCompaniesByFilter(filter);
 
-      expect(mockCompanyRepository.createQueryBuilder).toHaveBeenCalledWith('company');
-      expect(queryBuilder.andWhere).toHaveBeenCalledWith('company.joinedAt >= :joinedFrom', { joinedFrom: filter.joinedFrom });
+      expect(mockCompanyRepository.createQueryBuilder).toHaveBeenCalledWith(
+        'c',
+      );
+      expect(queryBuilder.andWhere).toHaveBeenCalledWith('c.joinedAt >= :jf', {
+        jf: filter.joinedFrom,
+      });
       expect(result).toEqual([]);
     });
   });

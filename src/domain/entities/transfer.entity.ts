@@ -30,7 +30,9 @@ export class Transfer {
     }
     const accountRegex = /^\d{3}-\d{6}-\d{2}$/;
     if (!accountRegex.test(account)) {
-      throw new Error(`Invalid ${type} account format. Expected: XXX-XXXXXX-XX`);
+      throw new Error(
+        `Invalid ${type} account format. Expected: XXX-XXXXXX-XX`,
+      );
     }
   }
 
@@ -39,7 +41,6 @@ export class Transfer {
       throw new Error('Company ID cannot be empty');
     }
   }
-
 
   public toPlainObject() {
     return {

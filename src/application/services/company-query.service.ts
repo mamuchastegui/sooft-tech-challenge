@@ -22,7 +22,9 @@ export class CompanyQueryService {
     private readonly dateProvider: DateProvider,
   ) {}
 
-  async findCompanies(queryDto: CompanyQueryDto): Promise<CompanyResponseDto[]> {
+  async findCompanies(
+    queryDto: CompanyQueryDto,
+  ): Promise<CompanyResponseDto[]> {
     const filter: CompanyFilter = {};
 
     if (queryDto.joinedFrom) {
@@ -41,9 +43,10 @@ export class CompanyQueryService {
       filter.transferTo = this.dateProvider.parseISO(queryDto.transferTo);
     }
 
-    const companies = await this.companyRepository.findCompaniesByFilter(filter);
-    
-    return companies.map(company => {
+    const companies =
+      await this.companyRepository.findCompaniesByFilter(filter);
+
+    return companies.map((company) => {
       const plainObject = company.toPlainObject();
       return new CompanyResponseDto(
         plainObject.id,

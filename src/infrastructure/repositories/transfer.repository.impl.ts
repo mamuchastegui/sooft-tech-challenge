@@ -25,23 +25,28 @@ export class TransferRepositoryImpl implements TransferRepository {
       createdAt: plainObject.createdAt,
     });
 
-    const savedEntity = await this.transferEntityRepository.save(transferEntity);
+    const savedEntity =
+      await this.transferEntityRepository.save(transferEntity);
     return this.entityToDomain(savedEntity);
   }
 
   async findById(id: string): Promise<Transfer | null> {
-    const entity = await this.transferEntityRepository.findOne({ where: { id } });
+    const entity = await this.transferEntityRepository.findOne({
+      where: { id },
+    });
     return entity ? this.entityToDomain(entity) : null;
   }
 
   async findByCompanyId(companyId: string): Promise<Transfer[]> {
-    const entities = await this.transferEntityRepository.find({ where: { companyId } });
-    return entities.map(entity => this.entityToDomain(entity));
+    const entities = await this.transferEntityRepository.find({
+      where: { companyId },
+    });
+    return entities.map((entity) => this.entityToDomain(entity));
   }
 
   async findAll(): Promise<Transfer[]> {
     const entities = await this.transferEntityRepository.find();
-    return entities.map(entity => this.entityToDomain(entity));
+    return entities.map((entity) => this.entityToDomain(entity));
   }
 
   async findTransfersByCompanyIdAndDateRange(
@@ -56,7 +61,7 @@ export class TransferRepositoryImpl implements TransferRepository {
       .andWhere('transfer.createdAt <= :endDate', { endDate })
       .getMany();
 
-    return entities.map(entity => this.entityToDomain(entity));
+    return entities.map((entity) => this.entityToDomain(entity));
   }
 
   private entityToDomain(entity: TransferEntity): Transfer {

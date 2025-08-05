@@ -7,7 +7,8 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 export const getDatabaseConfig = (): TypeOrmModuleOptions => {
-  const isLocal = process.env.NODE_ENV === 'local' || !process.env.DATABASE_HOST;
+  const isLocal =
+    process.env.NODE_ENV === 'local' || !process.env.DATABASE_HOST;
 
   return {
     type: 'postgres',
@@ -22,9 +23,9 @@ export const getDatabaseConfig = (): TypeOrmModuleOptions => {
     ssl: isLocal ? false : { rejectUnauthorized: false },
     extra: {
       max: 10, // Connection pool max size
-      min: 2,  // Connection pool min size
+      min: 2, // Connection pool min size
       acquireTimeoutMillis: 60000, // Connection timeout
-      idleTimeoutMillis: 600000,   // Idle connection timeout (10 minutes)
+      idleTimeoutMillis: 600000, // Idle connection timeout (10 minutes)
       connectionTimeoutMillis: 10000, // Connection establishment timeout
     },
     cache: {

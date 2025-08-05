@@ -34,13 +34,12 @@ describe('TransferService', () => {
     mockRepository = module.get(TRANSFER_REPOSITORY_TOKEN);
   });
 
-
   describe('getTransfersByCompanyId', () => {
     it('should return transfers for specific company', async () => {
       const transfers = [
         new Transfer(
           '1',
-          1000.50,
+          1000.5,
           'company-1',
           '001-123456-01',
           '002-654321-02',
@@ -62,7 +61,7 @@ describe('TransferService', () => {
     it('should return transfer when found', async () => {
       const transfer = new Transfer(
         '1',
-        1000.50,
+        1000.5,
         'company-1',
         '001-123456-01',
         '002-654321-02',
@@ -75,7 +74,7 @@ describe('TransferService', () => {
 
       expect(mockRepository.findById).toHaveBeenCalledWith('1');
       expect(result.id).toBe('1');
-      expect(result.amount).toBe(1000.50);
+      expect(result.amount).toBe(1000.5);
     });
 
     it('should throw NotFoundException when transfer not found', async () => {

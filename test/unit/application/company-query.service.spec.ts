@@ -5,7 +5,10 @@ import { CompanyQueryService } from '../../../src/application/services/company-q
 import { CompanyRepository } from '../../../src/domain/repositories/company.repository.interface';
 import { DateProvider } from '../../../src/infrastructure/providers/date.provider';
 import { Company } from '../../../src/domain/entities/company.entity';
-import { CompanyTypeVO, CompanyType } from '../../../src/domain/value-objects/company-type.value-object';
+import {
+  CompanyTypeVO,
+  CompanyType,
+} from '../../../src/domain/value-objects/company-type.value-object';
 import { COMPANY_REPOSITORY_TOKEN } from '../../../src/domain/repositories/company.repository.token';
 
 describe('CompanyQueryService', () => {
@@ -87,7 +90,9 @@ describe('CompanyQueryService', () => {
         joinedFrom: '2023-12-01T00:00:00Z',
       });
 
-      expect(mockDateProvider.parseISO).toHaveBeenCalledWith('2023-12-01T00:00:00Z');
+      expect(mockDateProvider.parseISO).toHaveBeenCalledWith(
+        '2023-12-01T00:00:00Z',
+      );
       expect(mockRepository.findCompaniesByFilter).toHaveBeenCalledWith({
         joinedFrom: filterDate,
       });
@@ -113,7 +118,9 @@ describe('CompanyQueryService', () => {
         transferFrom: '2023-11-01T00:00:00Z',
       });
 
-      expect(mockDateProvider.parseISO).toHaveBeenCalledWith('2023-11-01T00:00:00Z');
+      expect(mockDateProvider.parseISO).toHaveBeenCalledWith(
+        '2023-11-01T00:00:00Z',
+      );
       expect(mockRepository.findCompaniesByFilter).toHaveBeenCalledWith({
         transferFrom: filterDate,
       });
@@ -150,5 +157,4 @@ describe('CompanyQueryService', () => {
       expect(result).toHaveLength(1);
     });
   });
-
 });

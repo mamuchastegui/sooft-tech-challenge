@@ -1,6 +1,11 @@
 // src/application/services/company.service.ts
 
-import { Injectable, ConflictException, NotFoundException, Inject } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+  Inject,
+} from '@nestjs/common';
 import { Company } from '../../domain/entities/company.entity';
 import { CompanyRepository } from '../../domain/repositories/company.repository.interface';
 import { CompanyTypeVO } from '../../domain/value-objects/company-type.value-object';
@@ -16,11 +21,17 @@ export class CompanyService {
     private readonly companyRepository: CompanyRepository,
   ) {}
 
-  async createCompany(createCompanyDto: CreateCompanyDto): Promise<CompanyResponseDto> {
-    const existingCompany = await this.companyRepository.findByCuit(createCompanyDto.cuit);
-    
+  async createCompany(
+    createCompanyDto: CreateCompanyDto,
+  ): Promise<CompanyResponseDto> {
+    const existingCompany = await this.companyRepository.findByCuit(
+      createCompanyDto.cuit,
+    );
+
     if (existingCompany) {
-      throw new ConflictException(`Company with CUIT ${createCompanyDto.cuit} already exists`);
+      throw new ConflictException(
+        `Company with CUIT ${createCompanyDto.cuit} already exists`,
+      );
     }
 
     const companyType = new CompanyTypeVO(createCompanyDto.type);
@@ -33,7 +44,7 @@ export class CompanyService {
     );
 
     const savedCompany = await this.companyRepository.save(company);
-    
+
     const plainObject = savedCompany.toPlainObject();
     return new CompanyResponseDto(
       plainObject.id,
@@ -44,10 +55,9 @@ export class CompanyService {
     );
   }
 
-
   async getCompanyById(id: string): Promise<CompanyResponseDto> {
     const company = await this.companyRepository.findById(id);
-    
+
     if (!company) {
       throw new NotFoundException(`Company with ID ${id} not found`);
     }

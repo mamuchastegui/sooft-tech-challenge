@@ -19,7 +19,10 @@ export class DateProvider {
   isValidISOString(dateString: string): boolean {
     try {
       const date = new Date(dateString);
-      return !isNaN(date.getTime()) && dateString === date.toISOString().split('.')[0] + 'Z';
+      return (
+        !isNaN(date.getTime()) &&
+        dateString === date.toISOString().split('.')[0] + 'Z'
+      );
     } catch {
       return false;
     }

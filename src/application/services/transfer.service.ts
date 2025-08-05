@@ -1,7 +1,6 @@
 // src/application/services/transfer.service.ts
 
 import { Injectable, NotFoundException, Inject } from '@nestjs/common';
-import { Transfer } from '../../domain/entities/transfer.entity';
 import { TransferRepository } from '../../domain/repositories/transfer.repository.interface';
 import { TransferResponseDto } from '../dto/transfer-response.dto';
 import { TRANSFER_REPOSITORY_TOKEN } from '../../domain/repositories/transfer.repository.token';
@@ -13,11 +12,12 @@ export class TransferService {
     private readonly transferRepository: TransferRepository,
   ) {}
 
-
-  async getTransfersByCompanyId(companyId: string): Promise<TransferResponseDto[]> {
+  async getTransfersByCompanyId(
+    companyId: string,
+  ): Promise<TransferResponseDto[]> {
     const transfers = await this.transferRepository.findByCompanyId(companyId);
-    
-    return transfers.map(transfer => {
+
+    return transfers.map((transfer) => {
       const plainObject = transfer.toPlainObject();
       return new TransferResponseDto(
         plainObject.id,
@@ -32,7 +32,7 @@ export class TransferService {
 
   async getTransferById(id: string): Promise<TransferResponseDto> {
     const transfer = await this.transferRepository.findById(id);
-    
+
     if (!transfer) {
       throw new NotFoundException(`Transfer with ID ${id} not found`);
     }
