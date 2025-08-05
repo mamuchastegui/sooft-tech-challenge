@@ -20,6 +20,8 @@ This project follows **Hexagonal Architecture (Ports & Adapters)** with Clean Co
    - `?joinedFrom=2023-12-01T00:00:00Z&joinedTo=2023-12-31T23:59:59Z` - Companies joined within date range
    - `?transferFrom=2023-11-01T00:00:00Z&transferTo=2023-11-30T23:59:59Z` - Companies with transfers within date range
    - All parameters can be combined and are optional (inclusive filtering)
+3. **GET /v1/reports/companies/last-month** - Fixed monthly report with transfer statistics (materialized view)
+4. **GET /v1/reports/companies/joined-last-month** - Companies that joined in the previous month (materialized view)
 
 ### Domain Models
 
@@ -72,11 +74,14 @@ The application will be available at `http://localhost:3000`
 # Start PostgreSQL container
 docker compose up -d postgres
 
-# Run database migrations (create indexes)
+# Run database migrations (create indexes and materialized view)
 npm run db:migrate
 
 # Seed database with sample data
 npm run db:seed
+
+# Refresh materialized views (manual, otherwise scheduled nightly at 03:00 UTC)
+npm run db:refresh-mv
 
 # View database logs
 docker compose logs postgres
@@ -183,7 +188,45 @@ curl -X GET "http://localhost:3000/v1/companies?transfersSince=2023-11-01T00:00:
 curl -X GET "http://localhost:3000/v1/companies?joinedAfter=2023-12-01T00:00:00Z&transfersSince=2023-11-01T00:00:00Z"
 ```
 
+### Get Last Month Companies Report
+```bash
+curl -X GET "http://localhost:3000/v1/reports/companies/last-month"
+```
+
 **Response Format (200):**
+```json
+[
+  {
+    "id": "uuid",
+    "cuit": "30-12345678-1",
+    "businessName": "Tech Solutions SA",
+    "joinedAt": "2023-12-01T10:00:00.000Z",
+    "type": "CORPORATE",
+    "transferCount": 5,
+    "totalAmount": "150000.50"
+  }
+]
+```
+
+### Get Companies Joined Last Month Report
+```bash
+curl -X GET "http://localhost:3000/v1/reports/companies/joined-last-month"
+```
+
+**Response Format (200):**
+```json
+[
+  {
+    "id": "uuid",
+    "cuit": "30-12345678-1",
+    "businessName": "Tech Solutions SA",
+    "joinedAt": "2023-12-01T10:00:00.000Z",
+    "type": "CORPORATE"
+  }
+]
+```
+
+**Companies Endpoint Response Format (200):**
 ```json
 [
   {

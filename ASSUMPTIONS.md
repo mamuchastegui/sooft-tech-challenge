@@ -288,6 +288,47 @@ This implementation follows established REST conventions and can serve as a temp
 4. **Extensible**: New parameters can be added without breaking changes
 5. **Documented**: OpenAPI specs provide complete parameter documentation
 
+## Scalability & Reporting
+
+### Materialized View Strategy
+
+Monthly reports are served via two specialized materialized views refreshed nightly (pg_cron in prod; script in dev). This approach keeps the `/companies` endpoint lightweight while satisfying the fixed reporting requirements:
+
+1. **`mv_companies_last_month`**: Companies with transfer statistics for the previous month
+2. **`mv_companies_joined_last_month`**: Companies that joined in the previous month (simpler, no aggregation)
+
+#### Benefits of Materialized Views
+- **Performance**: Pre-aggregated data eliminates complex JOINs at query time
+- **Consistency**: Snapshot-based reporting provides consistent monthly metrics
+- **Scalability**: Query performance remains constant regardless of underlying data volume
+- **Resource Isolation**: Reporting queries don't impact transactional workloads
+
+#### Refresh Strategy
+- **Development**: Manual refresh via `npm run db:refresh-mv` (refreshes both views)
+- **Production**: Scheduled nightly refresh at 03:00 UTC using pg_cron (both views)
+- **Concurrency**: `REFRESH MATERIALIZED VIEW CONCURRENTLY` prevents blocking reads
+- **Index Maintenance**: Unique indexes on `id` for both views enable concurrent refresh
+- **Refresh Order**: Both views can be refreshed in parallel as they don't depend on each other
+
+#### Data Freshness Trade-offs
+- **Monthly Reports**: 24-hour data lag acceptable for business intelligence
+- **Real-time Needs**: Use `/companies` endpoint with filters for current data
+- **Hybrid Approach**: Combine cached aggregates with real-time deltas if needed
+
+### Reporting Architecture Considerations
+
+#### Scalability Thresholds
+- **Current**: Single materialized view handles up to 100K companies efficiently
+- **Medium Scale**: Partition by month for 1M+ companies with historical data
+- **Large Scale**: Separate reporting database with ETL pipeline for analytics
+
+#### Performance Expectations
+- **Materialized View Queries**: < 10ms each (index-based lookup)
+- **Refresh Operations**: 
+  - `mv_companies_last_month`: < 30 seconds for 100K companies (with aggregation)
+  - `mv_companies_joined_last_month`: < 5 seconds for 100K companies (simple filter)
+- **Storage Overhead**: ~30% additional space for both materialized views combined
+
 ## Documentation Completeness
 
-This document covers all major technical decisions and assumptions made during the REST API refactoring. The query parameter approach provides a solid foundation for extending the API with additional filtering capabilities while maintaining backward compatibility and RESTful design principles.
+This document covers all major technical decisions and assumptions made during the REST API refactoring and reporting implementation. The query parameter approach provides a solid foundation for extending the API with additional filtering capabilities while maintaining backward compatibility and RESTful design principles.
