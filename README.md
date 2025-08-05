@@ -32,7 +32,7 @@ This project follows **Hexagonal Architecture (Ports & Adapters)** with Clean Co
 
 - **Framework**: NestJS 10+
 - **Language**: TypeScript
-- **Database**: PostgreSQL (Amazon RDS free-tier in production, Docker locally)
+- **Database**: PostgreSQL (Amazon RDS free-tier in production)
 - **ORM**: TypeORM with entities and query builder
 - **Validation**: class-validator, class-transformer
 - **Documentation**: OpenAPI/Swagger 7.x
@@ -44,7 +44,6 @@ This project follows **Hexagonal Architecture (Ports & Adapters)** with Clean Co
 
 ### Prerequisites
 - Node.js 18+
-- Docker and Docker Compose
 - npm
 
 ### Quick Start
@@ -55,9 +54,6 @@ npm install
 
 # Copy environment configuration
 cp .env.example .env
-
-# Start local PostgreSQL database
-docker compose up -d postgres
 
 # Wait for database to be ready, then seed data
 npm run db:seed
@@ -71,9 +67,6 @@ The application will be available at `http://localhost:3000`
 ### Database Management
 
 ```bash
-# Start PostgreSQL container
-docker compose up -d postgres
-
 # Run database migrations (create indexes and materialized view)
 npm run db:migrate
 
@@ -82,12 +75,6 @@ npm run db:seed
 
 # Refresh materialized views (manual, otherwise scheduled nightly at 03:00 UTC)
 npm run db:refresh-mv
-
-# View database logs
-docker compose logs postgres
-
-# Stop and remove containers
-docker compose down
 ```
 
 ### Performance Optimization
@@ -420,9 +407,6 @@ npm run start:dev
 npm run build
 npm run start:prod
 ```
-
-### Docker (Optional)
-While not required, a Dockerfile can be added for containerized deployment.
 
 ## Contributing
 
