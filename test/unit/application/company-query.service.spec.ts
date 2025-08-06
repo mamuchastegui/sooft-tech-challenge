@@ -4,11 +4,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { CompanyQueryService } from '../../../src/application/services/company-query.service';
 import { CompanyRepository } from '../../../src/domain/repositories/company.repository.interface';
 import { DateProvider } from '../../../src/infrastructure/providers/date.provider';
-import { Company } from '../../../src/domain/entities/company.entity';
-import {
-  CompanyTypeVO,
-  CompanyType,
-} from '../../../src/domain/value-objects/company-type.value-object';
+import { CompanyFactory } from '../../../src/domain/factories/company.factory';
 import { COMPANY_REPOSITORY_TOKEN } from '../../../src/domain/repositories/company.repository.token';
 
 describe('CompanyQueryService', () => {
@@ -53,14 +49,14 @@ describe('CompanyQueryService', () => {
   describe('findCompanies', () => {
     it('should find companies with no filters', async () => {
       const companies = [
-        new Company(
-          '1',
-          '20-12345678-9',
-          'Test Company',
-          new Date(),
-          new CompanyTypeVO(CompanyType.CORPORATE),
-        ),
+        CompanyFactory.createCorporate('20-12345678-9', 'Test Company'),
       ];
+
+      // Set the ID for testing
+      Object.defineProperty(companies[0], '_id', {
+        value: '1',
+        writable: false,
+      });
 
       mockRepository.findCompaniesByFilter.mockResolvedValue(companies);
 
@@ -74,14 +70,18 @@ describe('CompanyQueryService', () => {
     it('should find companies with joinedAfter filter', async () => {
       const filterDate = new Date('2023-12-01T00:00:00Z');
       const companies = [
-        new Company(
-          '1',
-          '20-12345678-9',
-          'Recent Company',
-          new Date('2023-12-15T00:00:00Z'),
-          new CompanyTypeVO(CompanyType.PYME),
-        ),
+        CompanyFactory.createPyme('20-12345678-9', 'Recent Company'),
       ];
+
+      // Set the ID and joinedAt for testing
+      Object.defineProperty(companies[0], '_id', {
+        value: '1',
+        writable: false,
+      });
+      Object.defineProperty(companies[0], '_joinedAt', {
+        value: new Date('2023-12-15T00:00:00Z'),
+        writable: false,
+      });
 
       mockDateProvider.parseISO.mockReturnValue(filterDate);
       mockRepository.findCompaniesByFilter.mockResolvedValue(companies);
@@ -102,14 +102,18 @@ describe('CompanyQueryService', () => {
     it('should find companies with transfersSince filter', async () => {
       const filterDate = new Date('2023-11-01T00:00:00Z');
       const companies = [
-        new Company(
-          '1',
-          '20-12345678-9',
-          'Active Company',
-          new Date('2023-10-15T00:00:00Z'),
-          new CompanyTypeVO(CompanyType.CORPORATE),
-        ),
+        CompanyFactory.createCorporate('20-12345678-9', 'Active Company'),
       ];
+
+      // Set the ID and joinedAt for testing
+      Object.defineProperty(companies[0], '_id', {
+        value: '1',
+        writable: false,
+      });
+      Object.defineProperty(companies[0], '_joinedAt', {
+        value: new Date('2023-10-15T00:00:00Z'),
+        writable: false,
+      });
 
       mockDateProvider.parseISO.mockReturnValue(filterDate);
       mockRepository.findCompaniesByFilter.mockResolvedValue(companies);
@@ -131,14 +135,18 @@ describe('CompanyQueryService', () => {
       const joinedDate = new Date('2023-12-01T00:00:00Z');
       const transferDate = new Date('2023-11-01T00:00:00Z');
       const companies = [
-        new Company(
-          '1',
-          '20-12345678-9',
-          'Filtered Company',
-          new Date('2023-12-15T00:00:00Z'),
-          new CompanyTypeVO(CompanyType.PYME),
-        ),
+        CompanyFactory.createPyme('20-12345678-9', 'Filtered Company'),
       ];
+
+      // Set the ID and joinedAt for testing
+      Object.defineProperty(companies[0], '_id', {
+        value: '1',
+        writable: false,
+      });
+      Object.defineProperty(companies[0], '_joinedAt', {
+        value: new Date('2023-12-15T00:00:00Z'),
+        writable: false,
+      });
 
       mockDateProvider.parseISO
         .mockReturnValueOnce(joinedDate)

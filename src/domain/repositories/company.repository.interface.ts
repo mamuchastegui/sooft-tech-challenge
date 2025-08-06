@@ -1,6 +1,6 @@
 // src/domain/repositories/company.repository.interface.ts
 
-import { Company } from '../entities/company.entity';
+import { Company } from '../entities/company.base';
 import { CompanyFilter } from '../../application/services/company-query.service';
 
 export interface CompanyRepository {

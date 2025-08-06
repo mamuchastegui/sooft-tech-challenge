@@ -1,6 +1,6 @@
 // src/application/dto/company-response.dto.ts
 
-import { CompanyType } from '../../domain/value-objects/company-type.value-object';
+import { CompanyType } from '../../domain/value-objects/company-type.constants';
 
 export class CompanyResponseDto {
   id: string;

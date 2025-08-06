@@ -4,11 +4,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CompanyRepositoryImpl } from '../../../src/infrastructure/repositories/company.repository.impl';
-import { Company } from '../../../src/domain/entities/company.entity';
-import {
-  CompanyTypeVO,
-  CompanyType,
-} from '../../../src/domain/value-objects/company-type.value-object';
+import { CompanyFactory } from '../../../src/domain/factories/company.factory';
+import { COMPANY_TYPES } from '../../../src/domain/value-objects/company-type.constants';
 import { CompanyEntity } from '../../../src/infrastructure/database/entities/company.entity';
 import { TransferEntity } from '../../../src/infrastructure/database/entities/transfer.entity';
 
@@ -49,52 +46,65 @@ describe('CompanyRepositoryImpl', () => {
   });
 
   describe('save', () => {
-    it('should save a company successfully', async () => {
-      const company = new Company(
-        '1',
+    it('should save a PYME company successfully', async () => {
+      const company = CompanyFactory.createPyme(
         '20-12345678-9',
-        'Test Company',
-        new Date(),
-        new CompanyTypeVO(CompanyType.CORPORATE),
+        'Test PYME Company',
       );
 
       const companyEntity = {
-        id: '1',
+        id: company.id,
         cuit: '20-12345678-9',
-        businessName: 'Test Company',
+        businessName: 'Test PYME Company',
         joinedAt: expect.any(Date),
-        type: CompanyType.CORPORATE,
+        type: COMPANY_TYPES.PYME,
       };
 
-      mockCompanyRepository.create.mockReturnValue(
-        companyEntity as CompanyEntity,
-      );
       mockCompanyRepository.save.mockResolvedValue(
         companyEntity as CompanyEntity,
       );
 
       const result = await repository.save(company);
 
-      expect(mockCompanyRepository.create).toHaveBeenCalledWith({
-        id: '1',
-        cuit: '20-12345678-9',
-        businessName: 'Test Company',
+      expect(mockCompanyRepository.save).toHaveBeenCalled();
+      expect(result.getType()).toBe(COMPANY_TYPES.PYME);
+      expect(result.calculateTransferFee(1000)).toBe(50);
+    });
+
+    it('should save a Corporate company successfully', async () => {
+      const company = CompanyFactory.createCorporate(
+        '30-87654321-0',
+        'Test Corporate Company',
+      );
+
+      const companyEntity = {
+        id: company.id,
+        cuit: '30-87654321-0',
+        businessName: 'Test Corporate Company',
         joinedAt: expect.any(Date),
-        type: CompanyType.CORPORATE,
-      });
-      expect(mockCompanyRepository.save).toHaveBeenCalledWith(companyEntity);
-      expect(result).toBeInstanceOf(Company);
+        type: COMPANY_TYPES.CORPORATE,
+      };
+
+      mockCompanyRepository.save.mockResolvedValue(
+        companyEntity as CompanyEntity,
+      );
+
+      const result = await repository.save(company);
+
+      expect(mockCompanyRepository.save).toHaveBeenCalled();
+      expect(result.getType()).toBe(COMPANY_TYPES.CORPORATE);
+      expect(result.calculateTransferFee(1000)).toBe(1);
     });
   });
 
   describe('findById', () => {
-    it('should return a company when found', async () => {
+    it('should return a PYME company when found', async () => {
       const companyEntity = {
         id: '1',
         cuit: '20-12345678-9',
-        businessName: 'Test Company',
+        businessName: 'Test PYME Company',
         joinedAt: new Date(),
-        type: CompanyType.CORPORATE,
+        type: COMPANY_TYPES.PYME,
       };
 
       mockCompanyRepository.findOne.mockResolvedValue(
@@ -106,7 +116,7 @@ describe('CompanyRepositoryImpl', () => {
       expect(mockCompanyRepository.findOne).toHaveBeenCalledWith({
         where: { id: '1' },
       });
-      expect(result).toBeInstanceOf(Company);
+      expect(result?.getType()).toBe(COMPANY_TYPES.PYME);
       expect(result?.id).toBe('1');
     });
 
@@ -126,7 +136,7 @@ describe('CompanyRepositoryImpl', () => {
         cuit: '20-12345678-9',
         businessName: 'Test Company',
         joinedAt: new Date(),
-        type: CompanyType.CORPORATE,
+        type: COMPANY_TYPES.CORPORATE,
       };
 
       mockCompanyRepository.findOne.mockResolvedValue(
@@ -138,26 +148,26 @@ describe('CompanyRepositoryImpl', () => {
       expect(mockCompanyRepository.findOne).toHaveBeenCalledWith({
         where: { cuit: '20-12345678-9' },
       });
-      expect(result).toBeInstanceOf(Company);
+      expect(result?.getType()).toBe(COMPANY_TYPES.CORPORATE);
     });
   });
 
   describe('findAll', () => {
-    it('should return all companies', async () => {
+    it('should return all companies with correct polymorphic types', async () => {
       const companyEntities = [
         {
           id: '1',
           cuit: '20-12345678-9',
-          businessName: 'Company 1',
+          businessName: 'PYME Company',
           joinedAt: new Date(),
-          type: CompanyType.CORPORATE,
+          type: COMPANY_TYPES.PYME,
         },
         {
           id: '2',
-          cuit: '27-87654321-0',
-          businessName: 'Company 2',
+          cuit: '30-87654321-0',
+          businessName: 'Corporate Company',
           joinedAt: new Date(),
-          type: CompanyType.PYME,
+          type: COMPANY_TYPES.CORPORATE,
         },
       ];
 
@@ -169,8 +179,16 @@ describe('CompanyRepositoryImpl', () => {
 
       expect(mockCompanyRepository.find).toHaveBeenCalled();
       expect(result).toHaveLength(2);
-      expect(result[0]).toBeInstanceOf(Company);
-      expect(result[1]).toBeInstanceOf(Company);
+
+      const pymeCompany = result.find(
+        (c) => c.getType() === COMPANY_TYPES.PYME,
+      );
+      const corporateCompany = result.find(
+        (c) => c.getType() === COMPANY_TYPES.CORPORATE,
+      );
+
+      expect(pymeCompany?.calculateTransferFee(1000)).toBe(50);
+      expect(corporateCompany?.calculateTransferFee(1000)).toBe(1);
     });
   });
 

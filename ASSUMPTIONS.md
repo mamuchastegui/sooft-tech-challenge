@@ -329,6 +329,58 @@ Monthly reports are served via two specialized materialized views refreshed nigh
   - `mv_companies_joined_last_month`: < 5 seconds for 100K companies (simple filter)
 - **Storage Overhead**: ~30% additional space for both materialized views combined
 
+## Polymorphic Company Model Design
+
+### Business Rationale for PYME vs Corporate Differentiation
+
+The company model implements true polymorphism to reflect real-world Argentine business regulations and financial service requirements:
+
+#### PYME (Pequeñas y Medianas Empresas) Characteristics
+- **Regulatory Environment**: PYME companies in Argentina have specific government benefits and simplified compliance requirements
+- **Fee Structure**: Flat-rate pricing reflects the need for predictable costs for smaller businesses with limited cash flow
+- **Transfer Limits**: Lower limits align with typical PYME transaction volumes and risk management requirements
+- **Government Support**: PYME companies are eligible for various government support programs and subsidies
+- **Documentation**: Simplified documentation requirements to reduce administrative burden
+
+#### Corporate Company Characteristics  
+- **Regulatory Environment**: Larger corporations face stricter compliance requirements and additional reporting obligations
+- **Fee Structure**: Tiered percentage-based fees reflect ability to pay and higher transaction volumes
+- **Transfer Limits**: Higher limits accommodate enterprise-level financial operations
+- **Risk Profile**: Different risk assessment and monitoring requirements based on company size and complexity
+- **Compliance**: Additional audit and reporting requirements mandated by Argentine corporate law
+
+### Technical Architecture Decisions
+
+#### Polymorphism over Type Flags
+- **Maintainability**: Adding new company types (e.g., Government, NGO) requires only new subclasses
+- **Type Safety**: Compile-time guarantee that type-specific methods exist
+- **Business Logic Encapsulation**: Each type contains its own business rules and calculations
+- **Testing**: Easier to test each company type in isolation
+
+#### Strategy Pattern for Policies
+- **Flexibility**: Fee and limit policies can be changed independently of company types
+- **Extensibility**: New policy types can be added without modifying existing companies
+- **Single Responsibility**: Each policy class has one reason to change
+- **Testability**: Policies can be tested independently of the company entities
+
+#### Factory Pattern for Creation
+- **Consistency**: Ensures correct policy assignment for each company type
+- **Validation**: Central place to validate company creation business rules
+- **Abstraction**: Clients don't need to know about policy instantiation details
+
+### Performance Considerations
+
+#### Single Table Inheritance
+- **Query Performance**: All companies in one table enables efficient queries and joins
+- **Storage Efficiency**: No duplicated schema for common company fields
+- **Migration Path**: Easy to add new company types without schema changes
+- **Index Strategy**: Single indexes work across all company types
+
+#### Polymorphic Query Optimization
+- **Type-Based Filtering**: Database queries can filter by type column efficiently
+- **Lazy Loading**: Type-specific behaviors loaded only when needed
+- **Caching Strategy**: Different cache strategies per company type if needed
+
 ## Documentation Completeness
 
-This document covers all major technical decisions and assumptions made during the REST API refactoring and reporting implementation. The query parameter approach provides a solid foundation for extending the API with additional filtering capabilities while maintaining backward compatibility and RESTful design principles.
+This document covers all major technical decisions and assumptions made during the REST API refactoring, reporting implementation, and polymorphic domain modeling. The architecture provides a solid foundation for extending both API capabilities and business logic while maintaining backward compatibility and clean architectural principles.

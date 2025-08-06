@@ -6,11 +6,14 @@ import {
   Column,
   OneToMany,
   CreateDateColumn,
+  TableInheritance,
+  ChildEntity,
 } from 'typeorm';
 import { TransferEntity } from './transfer.entity';
 
 @Entity('companies')
-export class CompanyEntity {
+@TableInheritance({ column: { type: 'varchar', name: 'type' } })
+export abstract class CompanyEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -24,11 +27,17 @@ export class CompanyEntity {
   joinedAt: Date;
 
   @Column({
-    type: 'enum',
-    enum: ['PYME', 'CORPORATE'],
+    type: 'varchar',
+    length: 20,
   })
-  type: 'PYME' | 'CORPORATE';
+  type: string;
 
   @OneToMany(() => TransferEntity, (transfer) => transfer.company)
   transfers: TransferEntity[];
 }
+
+@ChildEntity('PYME')
+export class PymeCompanyEntity extends CompanyEntity {}
+
+@ChildEntity('CORPORATE')
+export class CorporateCompanyEntity extends CompanyEntity {}

@@ -6,13 +6,12 @@ import {
   NotFoundException,
   Inject,
 } from '@nestjs/common';
-import { Company } from '../../domain/entities/company.entity';
 import { CompanyRepository } from '../../domain/repositories/company.repository.interface';
-import { CompanyTypeVO } from '../../domain/value-objects/company-type.value-object';
+import { CompanyFactory } from '../../domain/factories/company.factory';
 import { CreateCompanyDto } from '../dto/create-company.dto';
 import { CompanyResponseDto } from '../dto/company-response.dto';
 import { COMPANY_REPOSITORY_TOKEN } from '../../domain/repositories/company.repository.token';
-import { v4 as uuidv4 } from 'uuid';
+import { COMPANY_TYPES } from '../../domain/value-objects/company-type.constants';
 
 @Injectable()
 export class CompanyService {
@@ -34,14 +33,16 @@ export class CompanyService {
       );
     }
 
-    const companyType = new CompanyTypeVO(createCompanyDto.type);
-    const company = new Company(
-      uuidv4(),
-      createCompanyDto.cuit,
-      createCompanyDto.businessName,
-      new Date(),
-      companyType,
-    );
+    // Validate company type
+    if (!Object.values(COMPANY_TYPES).includes(createCompanyDto.type as any)) {
+      throw new Error(`Invalid company type: ${createCompanyDto.type}`);
+    }
+
+    const company = CompanyFactory.create({
+      cuit: createCompanyDto.cuit,
+      businessName: createCompanyDto.businessName,
+      type: createCompanyDto.type as any,
+    });
 
     const savedCompany = await this.companyRepository.save(company);
 

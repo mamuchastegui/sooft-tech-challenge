@@ -3,12 +3,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Company } from '../../domain/entities/company.entity';
+import { Company } from '../../domain/entities/company.base';
 import { CompanyRepository } from '../../domain/repositories/company.repository.interface';
 import { CompanyFilter } from '../../application/services/company-query.service';
 import { CompanyEntity } from '../database/entities/company.entity';
 import { TransferEntity } from '../database/entities/transfer.entity';
-import { CompanyTypeVO } from '../../domain/value-objects/company-type.value-object';
+import { CompanyMapper } from '../mappers/company.mapper';
+import { CompanyFactory } from '../../domain/factories/company.factory';
+import { CompanyType } from '../../domain/value-objects/company-type.constants';
 
 @Injectable()
 export class CompanyRepositoryImpl implements CompanyRepository {
@@ -20,36 +22,28 @@ export class CompanyRepositoryImpl implements CompanyRepository {
   ) {}
 
   async save(company: Company): Promise<Company> {
-    const plainObject = company.toPlainObject();
-    const companyEntity = this.companyEntityRepository.create({
-      id: plainObject.id,
-      cuit: plainObject.cuit,
-      businessName: plainObject.businessName,
-      joinedAt: plainObject.joinedAt,
-      type: plainObject.type,
-    });
-
-    const savedEntity = await this.companyEntityRepository.save(companyEntity);
-    return this.entityToDomain(savedEntity);
+    const entity = CompanyMapper.toEntity(company);
+    const savedEntity = await this.companyEntityRepository.save(entity);
+    return CompanyMapper.toDomain(savedEntity);
   }
 
   async findById(id: string): Promise<Company | null> {
     const entity = await this.companyEntityRepository.findOne({
       where: { id },
     });
-    return entity ? this.entityToDomain(entity) : null;
+    return entity ? CompanyMapper.toDomain(entity) : null;
   }
 
   async findByCuit(cuit: string): Promise<Company | null> {
     const entity = await this.companyEntityRepository.findOne({
       where: { cuit },
     });
-    return entity ? this.entityToDomain(entity) : null;
+    return entity ? CompanyMapper.toDomain(entity) : null;
   }
 
   async findAll(): Promise<Company[]> {
     const entities = await this.companyEntityRepository.find();
-    return entities.map((entity) => this.entityToDomain(entity));
+    return CompanyMapper.toDomainList(entities);
   }
 
   async findCompaniesByFilter(filter: CompanyFilter): Promise<Company[]> {
@@ -64,7 +58,7 @@ export class CompanyRepositoryImpl implements CompanyRepository {
         .createQueryBuilder('c')
         .take(100) // Default page size
         .getMany();
-      return entities.map((entity) => this.entityToDomain(entity));
+      return CompanyMapper.toDomainList(entities);
     }
 
     // Build optimized query with EXISTS subquery for transfers
@@ -118,26 +112,15 @@ export class CompanyRepositoryImpl implements CompanyRepository {
       c_type: string;
     }>();
 
-    // Map raw results to domain entities
-    return rows.map(
-      (row) =>
-        new Company(
-          row.c_id,
-          row.c_cuit,
-          row.c_business_name,
-          row.c_joined_at,
-          new CompanyTypeVO(row.c_type),
-        ),
-    );
-  }
-
-  private entityToDomain(entity: CompanyEntity): Company {
-    return new Company(
-      entity.id,
-      entity.cuit,
-      entity.businessName,
-      entity.joinedAt,
-      new CompanyTypeVO(entity.type),
+    // Map raw results to domain entities using factory
+    return rows.map((row) =>
+      CompanyFactory.create({
+        id: row.c_id,
+        cuit: row.c_cuit,
+        businessName: row.c_business_name,
+        type: row.c_type as CompanyType,
+        joinedAt: row.c_joined_at,
+      }),
     );
   }
 }

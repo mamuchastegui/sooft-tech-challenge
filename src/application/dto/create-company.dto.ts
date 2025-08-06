@@ -1,7 +1,10 @@
 // src/application/dto/create-company.dto.ts
 
-import { IsEnum, IsNotEmpty, IsString, Matches } from 'class-validator';
-import { CompanyType } from '../../domain/value-objects/company-type.value-object';
+import { IsNotEmpty, IsString, Matches, IsIn } from 'class-validator';
+import {
+  CompanyType,
+  COMPANY_TYPES,
+} from '../../domain/value-objects/company-type.constants';
 
 export class CreateCompanyDto {
   @IsNotEmpty()
@@ -15,7 +18,7 @@ export class CreateCompanyDto {
   @IsString()
   businessName: string;
 
-  @IsEnum(CompanyType, {
+  @IsIn(Object.values(COMPANY_TYPES), {
     message: 'Type must be either PYME or CORPORATE',
   })
   type: CompanyType;

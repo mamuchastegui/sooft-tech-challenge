@@ -25,8 +25,65 @@ This project follows **Hexagonal Architecture (Ports & Adapters)** with Clean Co
 
 ### Domain Models
 
-- **Company**: `cuit`, `businessName`, `joinedAt`, `type` (PYME | CORPORATE)
+- **Company**: Abstract base class with polymorphic behavior
+  - **PymeCompany**: PYME companies with flat-rate fees and lower limits
+  - **CorporateCompany**: Corporate companies with tiered fees and higher limits
 - **Transfer**: `amount`, `companyId`, `debitAccount`, `creditAccount`, `createdAt`
+
+## Polymorphic Company Model
+
+The application implements true object-oriented polymorphism for company types, following hexagonal architecture and SOLID principles:
+
+### Architecture Pattern
+- **Abstract Base Class**: `Company` defines common behavior and abstract methods
+- **Concrete Subclasses**: `PymeCompany` and `CorporateCompany` implement specific business rules
+- **Strategy Pattern**: `FeePolicy` and `TransferLimitPolicy` interfaces enable pluggable business logic
+- **Factory Pattern**: `CompanyFactory` creates appropriate company instances based on type
+
+### Business Logic Differences
+
+#### PYME Companies
+- **Fee Structure**: Flat $50 fee for all transfers
+- **Transfer Limits**: 
+  - Maximum: $100,000 per transfer
+  - Daily: $50,000
+  - Monthly: $500,000
+- **Government Support**: Eligible for government programs
+- **Required Documents**: 4 basic documents including PYME certificate
+
+#### Corporate Companies  
+- **Fee Structure**: Tiered percentage-based fees
+  - 0.1% for amounts up to $10,000
+  - 0.5% for amounts $10,001-$100,000
+  - 1.0% for amounts above $100,000
+- **Transfer Limits**:
+  - Maximum: $1,000,000 per transfer
+  - Daily: $1,000,000
+  - Monthly: $10,000,000
+- **Government Support**: Not eligible
+- **Required Documents**: 6 documents including audited financials
+- **Compliance**: Additional reporting requirements
+
+### Technical Implementation
+- **Domain Layer**: Pure business logic with no framework dependencies
+- **Infrastructure Layer**: TypeORM single-table inheritance with discriminator column
+- **Persistence**: `CompanyMapper` handles domain ↔ entity conversion
+- **Creation**: Factory pattern ensures correct instantiation based on type
+
+### Usage Examples
+```typescript
+// Create companies using factory
+const pymeCompany = CompanyFactory.createPyme(cuit, businessName);
+const corporateCompany = CompanyFactory.createCorporate(cuit, businessName);
+
+// Polymorphic behavior
+console.log(pymeCompany.calculateTransferFee(10000)); // $50
+console.log(corporateCompany.calculateTransferFee(10000)); // $10
+
+// Type-specific methods
+console.log(pymeCompany.isEligibleForGovernmentSupport()); // true
+console.log(corporateCompany.requiresComplianceReporting()); // true
+```
 
 ## Technology Stack
 

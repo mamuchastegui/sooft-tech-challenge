@@ -4,11 +4,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { CompanyService } from '../../../src/application/services/company.service';
 import { CompanyRepository } from '../../../src/domain/repositories/company.repository.interface';
-import { Company } from '../../../src/domain/entities/company.entity';
-import {
-  CompanyTypeVO,
-  CompanyType,
-} from '../../../src/domain/value-objects/company-type.value-object';
+import { CompanyFactory } from '../../../src/domain/factories/company.factory';
+import { COMPANY_TYPES } from '../../../src/domain/value-objects/company-type.constants';
 import { CreateCompanyDto } from '../../../src/application/dto/create-company.dto';
 import { COMPANY_REPOSITORY_TOKEN } from '../../../src/domain/repositories/company.repository.token';
 
@@ -43,19 +40,22 @@ describe('CompanyService', () => {
     const createCompanyDto: CreateCompanyDto = {
       cuit: '20-12345678-9',
       businessName: 'Test Company SA',
-      type: CompanyType.CORPORATE,
+      type: COMPANY_TYPES.CORPORATE,
     };
 
     it('should create a new company successfully', async () => {
       mockRepository.findByCuit.mockResolvedValue(null);
 
-      const savedCompany = new Company(
-        'generated-id',
+      const savedCompany = CompanyFactory.createCorporate(
         createCompanyDto.cuit,
         createCompanyDto.businessName,
-        new Date(),
-        new CompanyTypeVO(createCompanyDto.type),
       );
+
+      // Set the ID for testing
+      Object.defineProperty(savedCompany, '_id', {
+        value: 'generated-id',
+        writable: false,
+      });
 
       mockRepository.save.mockResolvedValue(savedCompany);
 
@@ -71,13 +71,16 @@ describe('CompanyService', () => {
     });
 
     it('should throw ConflictException when company with CUIT already exists', async () => {
-      const existingCompany = new Company(
-        'existing-id',
+      const existingCompany = CompanyFactory.createPyme(
         createCompanyDto.cuit,
         'Existing Company',
-        new Date(),
-        new CompanyTypeVO(CompanyType.PYME),
       );
+
+      // Set the ID for testing
+      Object.defineProperty(existingCompany, '_id', {
+        value: 'existing-id',
+        writable: false,
+      });
 
       mockRepository.findByCuit.mockResolvedValue(existingCompany);
 
@@ -90,13 +93,13 @@ describe('CompanyService', () => {
 
   describe('getCompanyById', () => {
     it('should return company when found', async () => {
-      const company = new Company(
-        '1',
+      const company = CompanyFactory.createCorporate(
         '20-12345678-9',
         'Test Company',
-        new Date(),
-        new CompanyTypeVO(CompanyType.CORPORATE),
       );
+
+      // Set the ID for testing
+      Object.defineProperty(company, '_id', { value: '1', writable: false });
 
       mockRepository.findById.mockResolvedValue(company);
 
