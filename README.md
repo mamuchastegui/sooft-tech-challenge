@@ -168,7 +168,7 @@ The application is designed to work with Amazon RDS PostgreSQL free-tier in prod
 
 ## Scalability Roadmap
 
-See [ASSUMPTIONS.md](./ASSUMPTIONS.md#scalability-roadmap) for detailed scalability plans:
+See [ASSUMPTIONS.md](./docs/ASSUMPTIONS.md#scalability-roadmap) for detailed scalability plans:
 
 - **Scale-up**: Bigger RDS instances for increased throughput
 - **Scale-out**: Read replicas + optional manual sharding  
