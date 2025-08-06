@@ -24,12 +24,14 @@ async function bootstrap() {
   // Swagger/OpenAPI configuration
   const config = new DocumentBuilder()
     .setTitle('SOOFT Technology Backend Challenge')
-    .setDescription('API para gestión de empresas y seguimiento de transferencias con arquitectura hexagonal')
+    .setDescription(
+      'API para gestión de empresas y seguimiento de transferencias con arquitectura hexagonal',
+    )
     .setVersion('1.0')
     .addTag('companies', 'Gestión de empresas PYME y Corporativas')
     .addTag('reports', 'Reportes con vistas materializadas')
     .build();
-  
+
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 

@@ -1,7 +1,10 @@
 // src/application/dto/company-response.dto.ts
 
 import { ApiProperty } from '@nestjs/swagger';
-import { CompanyType, COMPANY_TYPES } from '../../domain/value-objects/company-type.constants';
+import {
+  CompanyType,
+  COMPANY_TYPES,
+} from '../../domain/value-objects/company-type.constants';
 
 export class CompanyResponseDto {
   @ApiProperty({

@@ -48,7 +48,7 @@ describe('CompanyController Core Negative Paths (e2e)', () => {
   describe('Duplicate CUIT scenarios', () => {
     it('should create first company then reject duplicate CUIT with 409', async () => {
       const uniqueCuit = generateCuit();
-      
+
       // First request should succeed
       await request(app.getHttpServer())
         .post('/v1/companies')

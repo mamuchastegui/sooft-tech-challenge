@@ -11,7 +11,13 @@ import {
   HttpStatus,
   HttpCode,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiBody } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiQuery,
+  ApiBody,
+} from '@nestjs/swagger';
 import { CompanyService } from '../../application/services/company.service';
 import { CompanyQueryService } from '../../application/services/company-query.service';
 import { CreateCompanyDto } from '../../application/dto/create-company.dto';
@@ -29,9 +35,10 @@ export class CompanyController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
-  @ApiOperation({ 
-    summary: 'Registrar nueva empresa', 
-    description: 'Registra una nueva empresa (PYME o Corporativa) en el sistema'
+  @ApiOperation({
+    summary: 'Registrar nueva empresa',
+    description:
+      'Registra una nueva empresa (PYME o Corporativa) en el sistema',
   })
   @ApiBody({
     type: CreateCompanyDto,
@@ -43,8 +50,8 @@ export class CompanyController {
         value: {
           cuit: '30-12345678-1',
           businessName: 'Mi Empresa PYME SRL',
-          type: 'PYME'
-        }
+          type: 'PYME',
+        },
       },
       corporate: {
         summary: 'Empresa Corporativa',
@@ -52,10 +59,10 @@ export class CompanyController {
         value: {
           cuit: '30-87654321-9',
           businessName: 'Gran Corporación SA',
-          type: 'CORPORATE'
-        }
-      }
-    }
+          type: 'CORPORATE',
+        },
+      },
+    },
   })
   @ApiResponse({
     status: 201,
@@ -66,8 +73,8 @@ export class CompanyController {
       cuit: '30-12345678-1',
       businessName: 'Tech Solutions SA',
       joinedAt: '2023-12-01T10:00:00.000Z',
-      type: 'CORPORATE'
-    }
+      type: 'CORPORATE',
+    },
   })
   @ApiResponse({
     status: 400,
@@ -77,10 +84,10 @@ export class CompanyController {
       message: [
         'CUIT must follow the format XX-XXXXXXXX-X',
         'businessName should not be empty',
-        'Type must be either PYME or CORPORATE'
+        'Type must be either PYME or CORPORATE',
       ],
-      error: 'Bad Request'
-    }
+      error: 'Bad Request',
+    },
   })
   @ApiResponse({
     status: 409,
@@ -88,8 +95,8 @@ export class CompanyController {
     example: {
       statusCode: 409,
       message: 'Company with CUIT 30-12345678-1 already exists',
-      error: 'Conflict'
-    }
+      error: 'Conflict',
+    },
   })
   async createCompany(
     @Body() createCompanyDto: CreateCompanyDto,
@@ -142,16 +149,16 @@ export class CompanyController {
         cuit: '30-12345678-1',
         businessName: 'Tech Solutions SA',
         joinedAt: '2023-12-01T10:00:00.000Z',
-        type: 'CORPORATE'
+        type: 'CORPORATE',
       },
       {
         id: 'aa1bb22c-333d-4444-e555-666777888999',
         cuit: '30-98765432-8',
         businessName: 'Mi PYME SRL',
         joinedAt: '2023-11-15T09:30:00.000Z',
-        type: 'PYME'
-      }
-    ]
+        type: 'PYME',
+      },
+    ],
   })
   @ApiResponse({
     status: 400,
@@ -159,8 +166,8 @@ export class CompanyController {
     example: {
       statusCode: 400,
       message: ['joinedFrom must be a valid ISO-8601 date string'],
-      error: 'Bad Request'
-    }
+      error: 'Bad Request',
+    },
   })
   async getCompanies(
     @Query() queryDto: CompanyQueryDto,

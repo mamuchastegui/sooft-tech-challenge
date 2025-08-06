@@ -15,11 +15,13 @@ export class ReportController {
   @HttpCode(200)
   @ApiOperation({
     summary: 'Empresas con transferencias del mes pasado',
-    description: 'Obtiene empresas con sus estadísticas de transferencias del mes anterior usando vista materializada para rendimiento óptimo.',
+    description:
+      'Obtiene empresas con sus estadísticas de transferencias del mes anterior usando vista materializada para rendimiento óptimo.',
   })
   @ApiResponse({
     status: 200,
-    description: 'Lista de empresas con estadísticas de transferencias del mes anterior',
+    description:
+      'Lista de empresas con estadísticas de transferencias del mes anterior',
     type: [CompanyMonthlyDto],
     example: [
       {
@@ -29,7 +31,7 @@ export class ReportController {
         joinedAt: '2023-12-01T10:00:00.000Z',
         type: 'CORPORATE',
         transferCount: 5,
-        totalAmount: '150000.50'
+        totalAmount: '150000.50',
       },
       {
         id: 'aa1bb22c-333d-4444-e555-666777888999',
@@ -38,9 +40,9 @@ export class ReportController {
         joinedAt: '2023-11-15T09:30:00.000Z',
         type: 'PYME',
         transferCount: 3,
-        totalAmount: '75500.00'
-      }
-    ]
+        totalAmount: '75500.00',
+      },
+    ],
   })
   async transferLastMonth(): Promise<CompanyMonthlyDto[]> {
     return this.repo.lastMonth();
@@ -50,7 +52,8 @@ export class ReportController {
   @HttpCode(200)
   @ApiOperation({
     summary: 'Empresas adheridas el mes pasado',
-    description: 'Obtiene empresas que se adhirieron al sistema en el mes anterior usando vista materializada para rendimiento óptimo.',
+    description:
+      'Obtiene empresas que se adhirieron al sistema en el mes anterior usando vista materializada para rendimiento óptimo.',
   })
   @ApiResponse({
     status: 200,
@@ -62,16 +65,16 @@ export class ReportController {
         cuit: '30-11111111-1',
         businessName: 'Nueva Empresa PYME',
         joinedAt: '2023-11-05T14:20:00.000Z',
-        type: 'PYME'
+        type: 'PYME',
       },
       {
         id: 'bb3cc44d-555e-6666-f777-888999aaabbb',
         cuit: '30-22222222-2',
         businessName: 'Corporación Reciente SA',
         joinedAt: '2023-11-12T16:45:00.000Z',
-        type: 'CORPORATE'
-      }
-    ]
+        type: 'CORPORATE',
+      },
+    ],
   })
   async joinedLastMonth(): Promise<CompanyJoinedMonthlyDto[]> {
     return this.repo.joinedLastMonth();

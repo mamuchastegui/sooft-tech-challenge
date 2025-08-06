@@ -48,7 +48,7 @@ describe('CompanyController Negative Paths (e2e)', () => {
   describe('POST /v1/companies - Duplicate CUIT scenarios', () => {
     it('should create first company successfully then reject duplicate CUIT with 409', async () => {
       const uniqueCuit = generateCuit();
-      
+
       // First request should succeed
       await request(app.getHttpServer())
         .post('/v1/companies')
@@ -82,7 +82,7 @@ describe('CompanyController Negative Paths (e2e)', () => {
 
     it('should reject duplicate CUIT even with different business name and type', async () => {
       const duplicateCuit = generateCuit();
-      
+
       // Create first company
       await request(app.getHttpServer())
         .post('/v1/companies')
@@ -130,7 +130,9 @@ describe('CompanyController Negative Paths (e2e)', () => {
         .get('/v1/companies?joinedFrom=not-a-date')
         .expect(400)
         .expect((res) => {
-          expect(res.body.message).toContain('joinedFrom must be a valid ISO-8601 date string');
+          expect(res.body.message).toContain(
+            'joinedFrom must be a valid ISO-8601 date string',
+          );
           expect(res.body.statusCode).toBe(400);
         });
     });
@@ -140,7 +142,9 @@ describe('CompanyController Negative Paths (e2e)', () => {
         .get('/v1/companies?transferFrom=invalid-timestamp')
         .expect(400)
         .expect((res) => {
-          expect(res.body.message).toContain('transferFrom must be a valid ISO-8601 date string');
+          expect(res.body.message).toContain(
+            'transferFrom must be a valid ISO-8601 date string',
+          );
           expect(res.body.statusCode).toBe(400);
         });
     });
@@ -150,7 +154,9 @@ describe('CompanyController Negative Paths (e2e)', () => {
         .get('/v1/companies?joinedFrom=2023-13-45T99:99:99Z')
         .expect(400)
         .expect((res) => {
-          expect(res.body.message).toContain('joinedFrom must be a valid ISO-8601 date string');
+          expect(res.body.message).toContain(
+            'joinedFrom must be a valid ISO-8601 date string',
+          );
         });
     });
 
@@ -161,7 +167,9 @@ describe('CompanyController Negative Paths (e2e)', () => {
           // Date without timezone might be accepted by some validators (200) or rejected (400)
           expect([200, 400]).toContain(res.status);
           if (res.status === 400) {
-            expect(res.body.message).toContain('joinedFrom must be a valid ISO-8601 date string');
+            expect(res.body.message).toContain(
+              'joinedFrom must be a valid ISO-8601 date string',
+            );
           }
         });
     });
@@ -172,8 +180,8 @@ describe('CompanyController Negative Paths (e2e)', () => {
         .expect(400)
         .expect((res) => {
           // Handle both string and array message formats
-          const messageText = Array.isArray(res.body.message) 
-            ? res.body.message.join(' ') 
+          const messageText = Array.isArray(res.body.message)
+            ? res.body.message.join(' ')
             : res.body.message;
           expect(messageText).toContain('must be a valid ISO-8601 date string');
           // Should mention both parameters in validation errors
@@ -183,13 +191,15 @@ describe('CompanyController Negative Paths (e2e)', () => {
 
     it('should handle mixed valid and invalid date parameters', async () => {
       const validDate = new Date().toISOString();
-      
+
       await request(app.getHttpServer())
         .get(`/v1/companies?joinedFrom=${validDate}&transferFrom=invalid-date`)
         .expect((res) => {
           expect([400, 500]).toContain(res.status);
           if (res.status === 400) {
-            expect(res.body.message).toContain('transferFrom must be a valid ISO-8601 date string');
+            expect(res.body.message).toContain(
+              'transferFrom must be a valid ISO-8601 date string',
+            );
           }
         });
     });
@@ -203,7 +213,11 @@ describe('CompanyController Negative Paths (e2e)', () => {
         .expect(400)
         .expect((res) => {
           expect(res.body.statusCode).toBe(400);
-          expect(res.body.message.some((msg: string) => msg.includes('should not be empty'))).toBe(true);
+          expect(
+            res.body.message.some((msg: string) =>
+              msg.includes('should not be empty'),
+            ),
+          ).toBe(true);
         });
     });
 
@@ -217,7 +231,9 @@ describe('CompanyController Negative Paths (e2e)', () => {
         })
         .expect(400)
         .expect((res) => {
-          expect(res.body.message).toContain('CUIT must follow the format XX-XXXXXXXX-X');
+          expect(res.body.message).toContain(
+            'CUIT must follow the format XX-XXXXXXXX-X',
+          );
         });
     });
 
@@ -231,7 +247,11 @@ describe('CompanyController Negative Paths (e2e)', () => {
         })
         .expect(400)
         .expect((res) => {
-          expect(res.body.message.some((msg: string) => msg.includes('should not be empty'))).toBe(true);
+          expect(
+            res.body.message.some((msg: string) =>
+              msg.includes('should not be empty'),
+            ),
+          ).toBe(true);
         });
     });
 
@@ -245,7 +265,9 @@ describe('CompanyController Negative Paths (e2e)', () => {
         })
         .expect(400)
         .expect((res) => {
-          expect(res.body.message).toContain('Type must be either PYME or CORPORATE');
+          expect(res.body.message).toContain(
+            'Type must be either PYME or CORPORATE',
+          );
         });
     });
 
@@ -260,7 +282,11 @@ describe('CompanyController Negative Paths (e2e)', () => {
         .expect(400)
         .expect((res) => {
           expect(res.body.statusCode).toBe(400);
-          expect(res.body.message.some((msg: string) => msg.includes('should not be empty'))).toBe(true);
+          expect(
+            res.body.message.some((msg: string) =>
+              msg.includes('should not be empty'),
+            ),
+          ).toBe(true);
         });
     });
 
@@ -277,7 +303,9 @@ describe('CompanyController Negative Paths (e2e)', () => {
         .expect(400)
         .expect((res) => {
           expect(res.body.statusCode).toBe(400);
-          expect(res.body.message).toContain('property unexpectedField should not exist');
+          expect(res.body.message).toContain(
+            'property unexpectedField should not exist',
+          );
         });
     });
   });
@@ -285,7 +313,7 @@ describe('CompanyController Negative Paths (e2e)', () => {
   describe('Error handling edge cases', () => {
     it('should handle very long business name gracefully', async () => {
       const longName = 'A'.repeat(300); // Exceeds typical VARCHAR limits
-      
+
       await request(app.getHttpServer())
         .post('/v1/companies')
         .send({
@@ -302,7 +330,7 @@ describe('CompanyController Negative Paths (e2e)', () => {
 
     it('should handle special characters in business name', async () => {
       const uniqueCuit = generateCuit();
-      
+
       await request(app.getHttpServer())
         .post('/v1/companies')
         .send({
@@ -335,7 +363,7 @@ describe('CompanyController Negative Paths (e2e)', () => {
   describe('Query parameter edge cases', () => {
     it('should handle extremely long query parameter values', async () => {
       const longValue = 'x'.repeat(1000);
-      
+
       await request(app.getHttpServer())
         .get(`/v1/companies?joinedFrom=${longValue}`)
         .expect((res) => {
@@ -346,7 +374,7 @@ describe('CompanyController Negative Paths (e2e)', () => {
 
     it('should handle query parameters with SQL injection attempts', async () => {
       const maliciousValue = encodeURIComponent("'; DROP TABLE companies; --");
-      
+
       await request(app.getHttpServer())
         .get(`/v1/companies?joinedFrom=${maliciousValue}`)
         .expect((res) => {
@@ -357,7 +385,7 @@ describe('CompanyController Negative Paths (e2e)', () => {
 
     it('should handle Unicode characters in query parameters', async () => {
       const unicodeValue = encodeURIComponent('2023-12-01T10:00:00Z🚀');
-      
+
       await request(app.getHttpServer())
         .get(`/v1/companies?joinedFrom=${unicodeValue}`)
         .expect((res) => {

@@ -33,7 +33,7 @@ La aplicación estará disponible en `http://localhost:3000`
 npm run db:migrate
 
 # Sembrar base de datos con datos de ejemplo
-npm run db:seed
+npm run db:seed  # Inserta 5 empresas mock + ~50 transferencias aleatorias para testing realista de reportes
 
 # Refrescar vistas materializadas
 npm run db:refresh-mv
