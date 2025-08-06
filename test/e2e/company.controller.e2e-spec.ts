@@ -4,7 +4,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../../src/app.module';
-import { CompanyType } from '../../src/domain/value-objects/company-type.value-object';
+import { COMPANY_TYPES } from '../../src/domain/value-objects/company-type.constants';
 
 describe('CompanyController (e2e)', () => {
   let app: INestApplication;
@@ -36,7 +36,7 @@ describe('CompanyController (e2e)', () => {
       const createCompanyDto = {
         cuit: '30-12345678-1',
         businessName: 'New Test Company SA',
-        type: CompanyType.CORPORATE,
+        type: COMPANY_TYPES.CORPORATE,
       };
 
       return request(app.getHttpServer())
@@ -56,7 +56,7 @@ describe('CompanyController (e2e)', () => {
       const createCompanyDto = {
         cuit: '20-12345678-9', // This CUIT exists in mock data
         businessName: 'Duplicate Company',
-        type: CompanyType.PYME,
+        type: COMPANY_TYPES.PYME,
       };
 
       return request(app.getHttpServer())
@@ -72,7 +72,7 @@ describe('CompanyController (e2e)', () => {
       const createCompanyDto = {
         cuit: '123456789',
         businessName: 'Test Company',
-        type: CompanyType.CORPORATE,
+        type: COMPANY_TYPES.CORPORATE,
       };
 
       return request(app.getHttpServer())

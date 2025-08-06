@@ -134,6 +134,10 @@ npm run db:seed
 npm run db:refresh-mv
 ```
 
+#### Materialized View Refresh
+
+The monthly reports are served from materialized views. In production these views are refreshed nightly by a scheduled job (pg_cron or an external CI task). In local/dev you can run `npm run db:refresh-mv` after seeding to populate the materialized views with current data.
+
 ### Performance Optimization
 
 The `/companies` endpoint has been optimized for sub-100ms response times:

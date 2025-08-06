@@ -16,7 +16,16 @@ export class CompanyQueryDto {
     {},
     { message: 'joinedFrom must be a valid ISO-8601 date string' },
   )
-  @Transform(({ value }) => (value ? new Date(value).toISOString() : undefined))
+  @Transform(({ value }) => {
+    if (!value) return undefined;
+    try {
+      const date = new Date(value);
+      if (isNaN(date.getTime())) return value; // Return original invalid value for validation to catch
+      return date.toISOString();
+    } catch {
+      return value; // Return original invalid value for validation to catch
+    }
+  })
   joinedFrom?: string;
 
   @ApiPropertyOptional({
@@ -30,7 +39,16 @@ export class CompanyQueryDto {
     {},
     { message: 'joinedTo must be a valid ISO-8601 date string' },
   )
-  @Transform(({ value }) => (value ? new Date(value).toISOString() : undefined))
+  @Transform(({ value }) => {
+    if (!value) return undefined;
+    try {
+      const date = new Date(value);
+      if (isNaN(date.getTime())) return value; // Return original invalid value for validation to catch
+      return date.toISOString();
+    } catch {
+      return value; // Return original invalid value for validation to catch
+    }
+  })
   joinedTo?: string;
 
   @ApiPropertyOptional({
@@ -44,7 +62,16 @@ export class CompanyQueryDto {
     {},
     { message: 'transferFrom must be a valid ISO-8601 date string' },
   )
-  @Transform(({ value }) => (value ? new Date(value).toISOString() : undefined))
+  @Transform(({ value }) => {
+    if (!value) return undefined;
+    try {
+      const date = new Date(value);
+      if (isNaN(date.getTime())) return value; // Return original invalid value for validation to catch
+      return date.toISOString();
+    } catch {
+      return value; // Return original invalid value for validation to catch
+    }
+  })
   transferFrom?: string;
 
   @ApiPropertyOptional({
@@ -58,6 +85,15 @@ export class CompanyQueryDto {
     {},
     { message: 'transferTo must be a valid ISO-8601 date string' },
   )
-  @Transform(({ value }) => (value ? new Date(value).toISOString() : undefined))
+  @Transform(({ value }) => {
+    if (!value) return undefined;
+    try {
+      const date = new Date(value);
+      if (isNaN(date.getTime())) return value; // Return original invalid value for validation to catch
+      return date.toISOString();
+    } catch {
+      return value; // Return original invalid value for validation to catch
+    }
+  })
   transferTo?: string;
 }

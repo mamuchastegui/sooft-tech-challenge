@@ -6,13 +6,10 @@ import {
   Column,
   OneToMany,
   CreateDateColumn,
-  TableInheritance,
-  ChildEntity,
 } from 'typeorm';
 import { TransferEntity } from './transfer.entity';
 
 @Entity('companies')
-@TableInheritance({ column: { type: 'varchar', name: 'type' } })
 export abstract class CompanyEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -36,8 +33,18 @@ export abstract class CompanyEntity {
   transfers: TransferEntity[];
 }
 
-@ChildEntity('PYME')
-export class PymeCompanyEntity extends CompanyEntity {}
+@Entity('companies')
+export class PymeCompanyEntity extends CompanyEntity {
+  constructor() {
+    super();
+    this.type = 'PYME';
+  }
+}
 
-@ChildEntity('CORPORATE')
-export class CorporateCompanyEntity extends CompanyEntity {}
+@Entity('companies')
+export class CorporateCompanyEntity extends CompanyEntity {
+  constructor() {
+    super();
+    this.type = 'CORPORATE';
+  }
+}
