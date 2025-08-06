@@ -9,13 +9,16 @@ export interface CompanyDTO {
 
 export class ValidationError extends Error {}
 
-function isValidCuit(cuit: string): boolean {
-  if (!/^\d{11}$/.test(cuit)) {
-    return false;
-  }
-  const digits = cuit.split("").map(Number);
-  const multipliers = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2];
-  const sum = multipliers.reduce((acc, mult, idx) => acc + mult * digits[idx], 0);
+function normalizeCuit(raw: string): string {
+  return raw.replace(/[^0-9]/g, "");
+}
+
+function isValidCuit(raw: string): boolean {
+  const clean = normalizeCuit(raw);
+  if (clean.length !== 11) return false;
+  const digits = clean.split("").map(Number);
+  const mult = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2];
+  const sum = mult.reduce((acc, m, i) => acc + m * digits[i], 0);
   let check = 11 - (sum % 11);
   if (check === 11) check = 0;
   if (check === 10) check = 9;
