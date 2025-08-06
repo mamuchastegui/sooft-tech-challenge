@@ -8,7 +8,7 @@ Una aplicación backend NestJS que implementa arquitectura hexagonal para gesti�
 # Clonar e instalar dependencias
 npm install
 
-# Copiar configuración de entorno
+# Copiar configuración de entorno y actualizar variables de entorno de la DB
 cp .env.example .env
 
 # Ejecutar migraciones y sembrar datos
