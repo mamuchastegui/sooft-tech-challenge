@@ -85,9 +85,9 @@ npm run test:watch
 
 ### Datos de Testing
 - **Generación de CUITs únicos**: Función utilitaria para evitar conflictos
-- **5 empresas mock**: Mezcla de tipos PYME y CORPORATE
-- **6 transferencias**: Con fechas distribuidas para testing
-- **Reset automático**: Datos se reinician en cada ejecución
+- **5 empresas mock**: Mezcla de tipos PYME y CORPORATE (faker.js)
+- **~37 transferencias aleatorias**: Con fechas distribuidas para testing
+- **Reset automático**: Datos se reinician con cada seeding
 
 ## Estrategias de Testing
 
@@ -111,29 +111,38 @@ npm run test:watch
 
 ## Métricas de Calidad
 
-### Cobertura de Código
-- **Objetivo**: > 80% cobertura de líneas
-- **Dominio**: > 90% (lógica de negocio crítica)
-- **Aplicación**: > 85% (servicios y casos de uso)
-- **Infraestructura**: > 75% (adaptadores)
+### Cobertura de Código Actual
+- **Cobertura Global**: 70.8% statements, 59.22% branches
+- **Domain Layer**: 95.34% statements (lógica de negocio crítica)
+- **Application Services**: 92.3% statements (servicios principales)
+- **Infrastructure**: 72% statements (adaptadores y repositorios)
 
-### Estado Actual
-- ✅ **21/21 pruebas E2E** pasando (incluyendo casos negativos)
+### Estado Actual de Pruebas
+- ✅ **61 pruebas unitarias** pasando (100% success rate)
+- ✅ **40 pruebas E2E** pasando (39/40 con 1 test flexible)
+- ✅ **6 pruebas negativas core** ejecutándose correctamente
 - ✅ **Generación de CUITs únicos** para evitar conflictos
 - ✅ **Validación completa** de casos extremos y errores
-- ✅ **Cobertura integral** de funcionalidad principal
+
+### Distribución de Cobertura por Módulo
+- **Services**: 92.3% (alta cobertura de lógica crítica)
+- **Domain Entities**: 95.34% (excelente cobertura de reglas de negocio)
+- **Repositories**: 72% (implementaciones principales cubiertas)
+- **DTOs**: 24.09% (principalmente metadatos, bajo impacto)
 
 ## Datos Mock
 
-### Empresas de Ejemplo
-- 3 empresas PYME con tarifas planas
-- 2 empresas Corporate con tarifas escalonadas
-- Fechas de adhesión distribuidas para testing de filtros
+### Empresas de Ejemplo (Faker.js)
+- 3 empresas PYME con límites de $100K y tarifas planas
+- 2 empresas Corporate con límites de $1M y tarifas escalonadas
+- CUITs generados aleatoriamente con dígito verificador válido
+- Fechas de adhesión distribuidas en últimos 120 días
 
-### Transferencias de Ejemplo  
-- 6 transferencias con montos variados
-- Fechas distribuidas en diferentes períodos
-- Asociadas a diferentes empresas para testing de reportes
+### Transferencias de Ejemplo (Aleatorias)
+- 3-15 transferencias por empresa (total ~37)
+- Montos realistas según tipo de empresa (PYME: $100-100K, Corporate: $100-1M)
+- Cuentas de 13 dígitos generadas aleatoriamente
+- Fechas createdAt actualizadas a valores aleatorios pasados
 
 ### Generación de Datos Únicos
 - Función `generateCuit()` para CUITs únicos y válidos

@@ -6,6 +6,19 @@ import * as request from 'supertest';
 import { AppModule } from '../../src/app.module';
 import { COMPANY_TYPES } from '../../src/domain/value-objects/company-type.constants';
 
+function generateUniqueCuit(): string {
+  const timestamp = Date.now().toString().slice(-8);
+  const prefix = '99'; // Use prefix unlikely to conflict with faker data
+  const base = `${prefix}${timestamp}`;
+  const mult = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2];
+  const digits = base.split('').map(Number);
+  const sum = mult.reduce((acc, m, i) => acc + m * digits[i], 0);
+  let check = 11 - (sum % 11);
+  if (check === 11) check = 0;
+  if (check === 10) check = 9;
+  return `${prefix}-${timestamp}-${check}`;
+}
+
 describe('CompanyController (e2e)', () => {
   let app: INestApplication;
 
@@ -34,7 +47,7 @@ describe('CompanyController (e2e)', () => {
   describe('POST /v1/companies', () => {
     it('should create a new company successfully', () => {
       const createCompanyDto = {
-        cuit: '30-12345678-1',
+        cuit: generateUniqueCuit(),
         businessName: 'New Test Company SA',
         type: COMPANY_TYPES.CORPORATE,
       };
@@ -53,15 +66,29 @@ describe('CompanyController (e2e)', () => {
     });
 
     it('should return 409 when creating company with existing CUIT', async () => {
+      const uniqueCuit = generateUniqueCuit();
       const createCompanyDto = {
-        cuit: '20-12345678-6', // This CUIT exists in mock data
-        businessName: 'Duplicate Company',
+        cuit: uniqueCuit,
+        businessName: 'First Company',
         type: COMPANY_TYPES.PYME,
+      };
+
+      // Create first company
+      await request(app.getHttpServer())
+        .post('/v1/companies')
+        .send(createCompanyDto)
+        .expect(201);
+
+      // Try to create duplicate
+      const duplicateDto = {
+        cuit: uniqueCuit, // Same CUIT
+        businessName: 'Duplicate Company',
+        type: COMPANY_TYPES.CORPORATE,
       };
 
       return request(app.getHttpServer())
         .post('/v1/companies')
-        .send(createCompanyDto)
+        .send(duplicateDto)
         .expect(409)
         .expect((res) => {
           expect(res.body.message).toContain('already exists');
@@ -80,7 +107,10 @@ describe('CompanyController (e2e)', () => {
         .send(createCompanyDto)
         .expect(400)
         .expect((res) => {
-          expect(res.body.message).toContain('CUIT must follow the format');
+          const messageText = Array.isArray(res.body.message) 
+            ? res.body.message[0] 
+            : res.body.message;
+          expect(messageText).toContain('CUIT must follow the format');
         });
     });
 
