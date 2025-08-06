@@ -1,21 +1,12 @@
 {
-  "httpMethod": "POST",
-  "path": "/v1/companies",
-  "headers": {
-    "Content-Type": "application/json",
-    "Accept": "application/json"
-  },
-  "body": "{\"cuit\":\"20-12345678-6\",\"businessName\":\"New Tech Company SA\",\"type\":\"CORPORATE\"}",
-  "isBase64Encoded": false,
-  "queryStringParameters": null,
-  "pathParameters": null,
-  "requestContext": {
-    "httpMethod": "POST",
-    "requestId": "test-request-id",
-    "path": "/v1/companies",
-    "stage": "dev",
-    "identity": {
-      "sourceIp": "127.0.0.1"
-    }
-  }
+  "version": "0",
+  "id": "ac4f9eb1-5a8d-4c1e-bb11-03e8af76e12c",
+  "detail-type": "CompanyRegistrationRequested",
+  "source": "interbanking.api",
+  "time": "2025-08-06T15:00:00Z",
+  "region": "us-east-1",
+  "detail": [
+    { "id": "f5ac33f3-5e6c-404d-bd73-d4f66efa52cf", "cuit": "20301122334", "businessName": "Empresa A", "type": "PYME" },
+    { "id": "647ce0bd-e57b-4509-9a86-f8fc04f093f8", "cuit": "30199887766", "businessName": "Empresa B", "type": "CORPORATE" }
+  ]
 }
