@@ -55,6 +55,9 @@ Este proyecto sigue **Arquitectura Hexagonal** con principios de Código Limpio:
 - **Dominio**: Lógica de negocio pura con modelo polimórfico de empresas
 - **Infraestructura**: Adaptadores de base de datos y persistencia
 
+### Diagrama de Infraestructura
+![Architecture Diagram](docs/architecture.png)
+
 Ver [documentación completa de arquitectura](docs/architecture.md)
 
 ## 🧪 Testing

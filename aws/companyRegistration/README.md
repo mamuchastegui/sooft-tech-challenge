@@ -1,5 +1,7 @@
 ### Explicación breve de la arquitectura
 
+![Architecture Diagram](../../docs/architecture.png)
+
 **Objetivo**
 Permitir dos vías de alta de empresas — una **síncrona** para el back-office interno y otra **asíncrona / event-driven** para partners o cargas masivas, manteniendo una única lógica de negocio en el microservicio `company-service`.
 
@@ -19,10 +21,10 @@ Permitir dos vías de alta de empresas — una **síncrona** para el back-office
 
 1. **API Gateway** envía un `PutEvents` al **EventBridge Bus** (o los partners suben un CSV a **S3**, que también genera un evento).
 2. **EventBridge** aplica reglas/filtros y dispara la **Lambda Ingest**.
-3. La Lambda valida formato (usa librería compartida del monorepo) y publica el mensaje en **SQS**.
+3. La **Lambda** valida formato (usa librería compartida del monorepo) y publica el mensaje en **SQS**.
 4. El **consumer** (`company-consumer`) hace **long-poll** de la queue, llama a la misma lógica de negocio de registro de empresa, y guarda en la **DB** (es el mismo repo en otra instancia dedicada).
 5. Si todo sale bien, emite un evento «company registered» a **SNS** para notificar otros sistemas (e-mails, auditoría, etc.).
-6. Si el procesamiento falla, SQS reintenta, tras **> 3 intentos** el mensaje pasa a la **DLQ** para análisis manual.
+6.  Si el procesamiento falla, SQS reintenta, tras **> 3 intentos** el mensaje pasa a la **DLQ** para análisis manual.
 
 *Vale aclarar que la parte de notificar a otros sistemas con SNS es solo conceptual, no fue implementada. También asumir que los eventos serían consumidos un modelo push para aprovechar el mismo servicio.*
 
