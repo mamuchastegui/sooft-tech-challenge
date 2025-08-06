@@ -102,18 +102,6 @@ console.log(pymeCompany.isEligibleForGovernmentSupport()); // true
 console.log(corporateCompany.requiresComplianceReporting()); // true
 ```
 
-### Validación y Límites
-```typescript
-// Validación de límites específicos por tipo
-try {
-  pymeCompany.validateTransferAmount(150000); // Lanza error - excede límite PYME
-} catch (error) {
-  console.log(error.message); // "Transfer amount exceeds PYME limit"
-}
-
-corporateCompany.validateTransferAmount(150000); // OK - dentro del límite corporativo
-```
-
 ## Ventajas del Diseño
 
 ### Extensibilidad

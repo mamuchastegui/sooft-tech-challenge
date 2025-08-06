@@ -2,7 +2,7 @@
   "version": "0",
   "id": "ac4f9eb1-5a8d-4c1e-bb11-03e8af76e12c",
   "detail-type": "CompanyRegistrationRequested",
-  "source": "interbanking.api",
+  "source": "company.api",
   "time": "2025-08-06T15:00:00Z",
   "region": "us-east-1",
   "detail": [

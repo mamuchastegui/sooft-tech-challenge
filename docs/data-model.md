@@ -134,7 +134,6 @@ WHERE c.joined_at >= '2023-12-01T00:00:00Z'
 #### Más de 1,000,000 empresas
 - Migrar a Aurora PostgreSQL Serverless v2
 - Implementar particionado de tablas por fecha
-- Considerar caché distribuido (Redis/ElastiCache)
 
 ## Configuración de TypeORM
 
@@ -154,20 +153,6 @@ WHERE c.joined_at >= '2023-12-01T00:00:00Z'
     acquireTimeoutMillis: 30000,
     createTimeoutMillis: 30000,
     idleTimeoutMillis: 30000
-  }
-}
-```
-
-### Configuración de Caché
-```typescript
-{
-  cache: {
-    type: 'redis',
-    options: {
-      host: 'localhost',
-      port: 6379,
-    },
-    duration: 30000, // 30 seconds
   }
 }
 ```

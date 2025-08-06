@@ -84,7 +84,6 @@ DATABASE_PORT=5432
 DATABASE_USERNAME=postgres
 DATABASE_PASSWORD=password
 DATABASE_NAME=sooft_db
-DATABASE_SSL=false
 
 # Aplicación
 NODE_ENV=development
@@ -127,7 +126,6 @@ DATABASE_USERNAME=your_username
 DATABASE_PASSWORD=your_password
 DATABASE_NAME=your_database
 DATABASE_PORT=5432
-DATABASE_SSL=true
 NODE_ENV=production
 ```
 
