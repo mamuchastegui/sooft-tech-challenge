@@ -93,17 +93,21 @@ Este proyecto sigue la **Arquitectura Hexagonal** con principios de Código Limp
 
 ## Consideraciones de Seguridad
 
-- Validación y sanitización de entrada para todos los parámetros de consulta
+**Implementado:**
+- Validación y sanitización de entrada con class-validator
 - Configuración CORS para solicitudes cross-origin
-- No exposición de datos sensibles en mensajes de error
-- Configuración de variables de entorno para secrets
-- Capacidades de request limit (se puede agregar con @nestjs/throttler)
+- Variables de entorno para configuración
+- Whitelist de propiedades en ValidationPipe
+
+**No implementado:**
+- Rate limiting / throttling
+- Helmet para headers de seguridad
+- Logging de eventos de seguridad
 
 ## Monitoreo y Observabilidad
 
 La aplicación incluye:
-- Registro estructurado con contexto de parámetros de consulta
-- Registro de request/response con información de filtros
-- Seguimiento y reporte de errores
-- Métricas de rendimiento vía interceptores de NestJS
 - Documentación OpenAPI para monitoreo de API
+- Logs básicos de aplicación (inicio/puerto)
+
+> **Nota**: Features como logging estructurado, interceptores de métricas y seguimiento de errores no están implementadas en la versión actual.
