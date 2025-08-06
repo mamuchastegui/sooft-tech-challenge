@@ -48,13 +48,13 @@ describe('CompanyRepositoryImpl', () => {
   describe('save', () => {
     it('should save a PYME company successfully', async () => {
       const company = CompanyFactory.createPyme(
-        '20-12345678-9',
+        '20-12345678-6',
         'Test PYME Company',
       );
 
       const companyEntity = {
         id: company.id,
-        cuit: '20-12345678-9',
+        cuit: '20-12345678-6',
         businessName: 'Test PYME Company',
         joinedAt: expect.any(Date),
         type: COMPANY_TYPES.PYME,
@@ -101,7 +101,7 @@ describe('CompanyRepositoryImpl', () => {
     it('should return a PYME company when found', async () => {
       const companyEntity = {
         id: '1',
-        cuit: '20-12345678-9',
+        cuit: '20-12345678-6',
         businessName: 'Test PYME Company',
         joinedAt: new Date(),
         type: COMPANY_TYPES.PYME,
@@ -133,7 +133,7 @@ describe('CompanyRepositoryImpl', () => {
     it('should return a company when found by CUIT', async () => {
       const companyEntity = {
         id: '1',
-        cuit: '20-12345678-9',
+        cuit: '20-12345678-6',
         businessName: 'Test Company',
         joinedAt: new Date(),
         type: COMPANY_TYPES.CORPORATE,
@@ -143,10 +143,10 @@ describe('CompanyRepositoryImpl', () => {
         companyEntity as CompanyEntity,
       );
 
-      const result = await repository.findByCuit('20-12345678-9');
+      const result = await repository.findByCuit('20-12345678-6');
 
       expect(mockCompanyRepository.findOne).toHaveBeenCalledWith({
-        where: { cuit: '20-12345678-9' },
+        where: { cuit: '20-12345678-6' },
       });
       expect(result?.getType()).toBe(COMPANY_TYPES.CORPORATE);
     });
@@ -157,7 +157,7 @@ describe('CompanyRepositoryImpl', () => {
       const companyEntities = [
         {
           id: '1',
-          cuit: '20-12345678-9',
+          cuit: '20-12345678-6',
           businessName: 'PYME Company',
           joinedAt: new Date(),
           type: COMPANY_TYPES.PYME,

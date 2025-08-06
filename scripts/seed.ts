@@ -51,7 +51,7 @@ async function seed() {
     const companies = [
       {
         id: companyId1,
-        cuit: '20-12345678-9',
+        cuit: '20-12345678-6',
         businessName: 'Tech Solutions SA',
         joinedAt: new Date(currentDate.getTime() - 15 * 24 * 60 * 60 * 1000), // 15 days ago
         type: 'CORPORATE' as const,

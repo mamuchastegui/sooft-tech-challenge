@@ -11,7 +11,7 @@ describe('Company Fee Calculation', () => {
 
     beforeEach(() => {
       pymeCompany = CompanyFactory.createPyme(
-        '20-12345678-9',
+        '20-12345678-6',
         'PYME Test Company',
       );
     });
@@ -90,7 +90,7 @@ describe('Company Fee Calculation', () => {
   describe('CompanyFactory', () => {
     it('should create correct company type based on input', () => {
       const pymeCompany = CompanyFactory.create({
-        cuit: '20-12345678-9',
+        cuit: '20-12345678-6',
         businessName: 'Test PYME',
         type: COMPANY_TYPES.PYME,
       });
@@ -108,7 +108,7 @@ describe('Company Fee Calculation', () => {
     it('should throw error for unknown company type', () => {
       expect(() =>
         CompanyFactory.create({
-          cuit: '20-12345678-9',
+          cuit: '20-12345678-6',
           businessName: 'Test Company',
           type: 'UNKNOWN' as any,
         }),

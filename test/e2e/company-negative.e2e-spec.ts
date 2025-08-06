@@ -6,6 +6,20 @@ import * as request from 'supertest';
 import { AppModule } from '../../src/app.module';
 import { COMPANY_TYPES } from '../../src/domain/value-objects/company-type.constants';
 
+function generateCuit(prefix = '30'): string {
+  const middle = Math.floor(Math.random() * 1e8)
+    .toString()
+    .padStart(8, '0');
+  const base = `${prefix}${middle}`;
+  const mult = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2];
+  const digits = base.split('').map(Number);
+  const sum = mult.reduce((acc, m, i) => acc + m * digits[i], 0);
+  let check = 11 - (sum % 11);
+  if (check === 11) check = 0;
+  if (check === 10) check = 9;
+  return `${prefix}-${middle}-${check}`;
+}
+
 describe('CompanyController Negative Paths (e2e)', () => {
   let app: INestApplication;
 
@@ -33,8 +47,7 @@ describe('CompanyController Negative Paths (e2e)', () => {
 
   describe('POST /v1/companies - Duplicate CUIT scenarios', () => {
     it('should create first company successfully then reject duplicate CUIT with 409', async () => {
-      const timestamp = Date.now().toString().slice(-8);
-      const uniqueCuit = `30-${timestamp}-9`;
+      const uniqueCuit = generateCuit();
       
       // First request should succeed
       await request(app.getHttpServer())
@@ -68,8 +81,7 @@ describe('CompanyController Negative Paths (e2e)', () => {
     });
 
     it('should reject duplicate CUIT even with different business name and type', async () => {
-      const timestamp = Date.now().toString().slice(-8);
-      const duplicateCuit = `30-${timestamp}-8`;
+      const duplicateCuit = generateCuit();
       
       // Create first company
       await request(app.getHttpServer())
@@ -100,7 +112,7 @@ describe('CompanyController Negative Paths (e2e)', () => {
       await request(app.getHttpServer())
         .post('/v1/companies')
         .send({
-          cuit: '20-12345678-9',
+          cuit: '20-12345678-6',
           businessName: 'Trying to duplicate mock data',
           type: COMPANY_TYPES.PYME,
         })
@@ -289,8 +301,7 @@ describe('CompanyController Negative Paths (e2e)', () => {
     });
 
     it('should handle special characters in business name', async () => {
-      const timestamp = Date.now().toString().slice(-8);
-      const uniqueCuit = `30-${timestamp}-5`;
+      const uniqueCuit = generateCuit();
       
       await request(app.getHttpServer())
         .post('/v1/companies')

@@ -49,7 +49,7 @@ describe('CompanyQueryService', () => {
   describe('findCompanies', () => {
     it('should find companies with no filters', async () => {
       const companies = [
-        CompanyFactory.createCorporate('20-12345678-9', 'Test Company'),
+        CompanyFactory.createCorporate('20-12345678-6', 'Test Company'),
       ];
 
       // Set the ID for testing
@@ -70,7 +70,7 @@ describe('CompanyQueryService', () => {
     it('should find companies with joinedAfter filter', async () => {
       const filterDate = new Date('2023-12-01T00:00:00Z');
       const companies = [
-        CompanyFactory.createPyme('20-12345678-9', 'Recent Company'),
+        CompanyFactory.createPyme('20-12345678-6', 'Recent Company'),
       ];
 
       // Set the ID and joinedAt for testing
@@ -102,7 +102,7 @@ describe('CompanyQueryService', () => {
     it('should find companies with transfersSince filter', async () => {
       const filterDate = new Date('2023-11-01T00:00:00Z');
       const companies = [
-        CompanyFactory.createCorporate('20-12345678-9', 'Active Company'),
+        CompanyFactory.createCorporate('20-12345678-6', 'Active Company'),
       ];
 
       // Set the ID and joinedAt for testing
@@ -135,7 +135,7 @@ describe('CompanyQueryService', () => {
       const joinedDate = new Date('2023-12-01T00:00:00Z');
       const transferDate = new Date('2023-11-01T00:00:00Z');
       const companies = [
-        CompanyFactory.createPyme('20-12345678-9', 'Filtered Company'),
+        CompanyFactory.createPyme('20-12345678-6', 'Filtered Company'),
       ];
 
       // Set the ID and joinedAt for testing

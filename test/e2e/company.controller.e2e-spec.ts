@@ -54,7 +54,7 @@ describe('CompanyController (e2e)', () => {
 
     it('should return 409 when creating company with existing CUIT', async () => {
       const createCompanyDto = {
-        cuit: '20-12345678-9', // This CUIT exists in mock data
+        cuit: '20-12345678-6', // This CUIT exists in mock data
         businessName: 'Duplicate Company',
         type: COMPANY_TYPES.PYME,
       };

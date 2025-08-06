@@ -5,13 +5,17 @@ import {
   ConflictException,
   NotFoundException,
   Inject,
+  BadRequestException,
 } from '@nestjs/common';
 import { CompanyRepository } from '../../domain/repositories/company.repository.interface';
 import { CompanyFactory } from '../../domain/factories/company.factory';
 import { CreateCompanyDto } from '../dto/create-company.dto';
 import { CompanyResponseDto } from '../dto/company-response.dto';
 import { COMPANY_REPOSITORY_TOKEN } from '../../domain/repositories/company.repository.token';
-import { COMPANY_TYPES } from '../../domain/value-objects/company-type.constants';
+import {
+  validateCompanyRequest,
+  ValidationError,
+} from '../../../shared-lib/validation';
 
 @Injectable()
 export class CompanyService {
@@ -23,25 +27,30 @@ export class CompanyService {
   async createCompany(
     createCompanyDto: CreateCompanyDto,
   ): Promise<CompanyResponseDto> {
+    const candidate = { ...createCompanyDto };
+    try {
+      validateCompanyRequest(candidate);
+    } catch (e) {
+      if (e instanceof ValidationError) {
+        throw new BadRequestException(e.message);
+      }
+      throw e;
+    }
+
     const existingCompany = await this.companyRepository.findByCuit(
-      createCompanyDto.cuit,
+      candidate.cuit,
     );
 
     if (existingCompany) {
       throw new ConflictException(
-        `Company with CUIT ${createCompanyDto.cuit} already exists`,
+        `Company with CUIT ${candidate.cuit} already exists`,
       );
     }
 
-    // Validate company type
-    if (!Object.values(COMPANY_TYPES).includes(createCompanyDto.type as any)) {
-      throw new Error(`Invalid company type: ${createCompanyDto.type}`);
-    }
-
     const company = CompanyFactory.create({
-      cuit: createCompanyDto.cuit,
-      businessName: createCompanyDto.businessName,
-      type: createCompanyDto.type as any,
+      cuit: candidate.cuit,
+      businessName: candidate.businessName,
+      type: candidate.type,
     });
 
     const savedCompany = await this.companyRepository.save(company);
