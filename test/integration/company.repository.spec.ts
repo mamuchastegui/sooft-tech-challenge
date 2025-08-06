@@ -56,7 +56,7 @@ describe('CompanyRepository Integration', () => {
   describe('save and retrieve', () => {
     it('should save and retrieve PYME company with correct polymorphic behavior', async () => {
       const pymeCompany = CompanyFactory.createPyme(
-        '20-12345678-9',
+        '20-12345678-6',
         'Test PYME Company',
       );
 
@@ -90,7 +90,7 @@ describe('CompanyRepository Integration', () => {
 
     it('should handle mixed company types in findAll', async () => {
       const pymeCompany = CompanyFactory.createPyme(
-        '20-12345678-9',
+        '20-12345678-6',
         'PYME Company',
       );
       const corporateCompany = CompanyFactory.createCorporate(
@@ -121,7 +121,7 @@ describe('CompanyRepository Integration', () => {
     });
 
     it('should find company by CUIT regardless of type', async () => {
-      const cuit = '20-12345678-9';
+      const cuit = '20-12345678-6';
       const pymeCompany = CompanyFactory.createPyme(cuit, 'Test Company');
 
       await repository.save(pymeCompany);
@@ -135,7 +135,7 @@ describe('CompanyRepository Integration', () => {
   describe('business logic validation', () => {
     it('should preserve business logic across persistence boundary', async () => {
       const pymeCompany = CompanyFactory.createPyme(
-        '20-12345678-9',
+        '20-12345678-6',
         'PYME Company',
       );
 
@@ -154,7 +154,7 @@ describe('CompanyRepository Integration', () => {
 
     it('should differentiate business rules between company types', async () => {
       const pymeCompany = CompanyFactory.createPyme(
-        '20-12345678-9',
+        '20-12345678-6',
         'PYME Company',
       );
       const corporateCompany = CompanyFactory.createCorporate(

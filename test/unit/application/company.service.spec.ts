@@ -38,7 +38,7 @@ describe('CompanyService', () => {
 
   describe('createCompany', () => {
     const createCompanyDto: CreateCompanyDto = {
-      cuit: '20-12345678-9',
+      cuit: '20-12345678-6',
       businessName: 'Test Company SA',
       type: COMPANY_TYPES.CORPORATE,
     };
@@ -94,7 +94,7 @@ describe('CompanyService', () => {
   describe('getCompanyById', () => {
     it('should return company when found', async () => {
       const company = CompanyFactory.createCorporate(
-        '20-12345678-9',
+        '20-12345678-6',
         'Test Company',
       );
 

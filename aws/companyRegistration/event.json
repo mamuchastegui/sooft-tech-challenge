@@ -5,7 +5,7 @@
     "Content-Type": "application/json",
     "Accept": "application/json"
   },
-  "body": "{\"cuit\":\"20-12345678-9\",\"businessName\":\"New Tech Company SA\",\"type\":\"CORPORATE\"}",
+  "body": "{\"cuit\":\"20-12345678-6\",\"businessName\":\"New Tech Company SA\",\"type\":\"CORPORATE\"}",
   "isBase64Encoded": false,
   "queryStringParameters": null,
   "pathParameters": null,

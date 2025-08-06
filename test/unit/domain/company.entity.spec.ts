@@ -14,14 +14,14 @@ describe('Company Entity', () => {
 
       const company = new Company(
         '1',
-        '20-12345678-9',
+        '20-12345678-6',
         'Test Company SA',
         joinedAt,
         companyType,
       );
 
       expect(company.id).toBe('1');
-      expect(company.cuit).toBe('20-12345678-9');
+      expect(company.cuit).toBe('20-12345678-6');
       expect(company.businessName).toBe('Test Company SA');
       expect(company.joinedAt).toBe(joinedAt);
       expect(company.type).toBe(companyType);
@@ -39,7 +39,7 @@ describe('Company Entity', () => {
       const companyType = new CompanyTypeVO(CompanyType.CORPORATE);
 
       expect(() => {
-        new Company('1', '20-12345678-9', '', new Date(), companyType);
+        new Company('1', '20-12345678-6', '', new Date(), companyType);
       }).toThrow('Business name cannot be empty');
     });
 
@@ -48,7 +48,7 @@ describe('Company Entity', () => {
       const longName = 'a'.repeat(256);
 
       expect(() => {
-        new Company('1', '20-12345678-9', longName, new Date(), companyType);
+        new Company('1', '20-12345678-6', longName, new Date(), companyType);
       }).toThrow('Business name cannot exceed 255 characters');
     });
   });
@@ -60,7 +60,7 @@ describe('Company Entity', () => {
 
       const company = new Company(
         '1',
-        '20-12345678-9',
+        '20-12345678-6',
         'Test Company',
         joinedAt,
         companyType,
@@ -70,7 +70,7 @@ describe('Company Entity', () => {
 
       expect(plainObject).toEqual({
         id: '1',
-        cuit: '20-12345678-9',
+        cuit: '20-12345678-6',
         businessName: 'Test Company',
         joinedAt,
         type: CompanyType.PYME,
