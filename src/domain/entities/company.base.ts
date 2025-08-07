@@ -3,17 +3,18 @@
 import { FeePolicy } from '../policies/fee-policy.interface';
 import { TransferLimitPolicy } from '../policies/transfer-limit-policy.interface';
 import { CompanyType } from '../value-objects/company-type.constants';
+import { Cuit } from '../value-objects/cuit.vo';
+import { Money } from '../value-objects/money.vo';
 
 export abstract class Company {
   protected constructor(
     protected readonly _id: string,
-    protected readonly _cuit: string,
+    protected readonly _cuit: Cuit,
     protected readonly _businessName: string,
     protected readonly _joinedAt: Date,
     protected readonly _feePolicy: FeePolicy,
     protected readonly _limitPolicy: TransferLimitPolicy,
   ) {
-    this.validateCuit(_cuit);
     this.validateBusinessName(_businessName);
   }
 
@@ -21,7 +22,7 @@ export abstract class Company {
     return this._id;
   }
 
-  get cuit(): string {
+  get cuit(): Cuit {
     return this._cuit;
   }
 
@@ -35,8 +36,8 @@ export abstract class Company {
 
   abstract getType(): CompanyType;
 
-  calculateTransferFee(amount: number): number {
-    return this._feePolicy.calculateTransferFee(amount);
+  calculateTransferFee(amount: Money): number {
+    return this._feePolicy.calculateTransferFee(amount.toNumber());
   }
 
   getMaxTransferAmount(): number {
@@ -51,28 +52,25 @@ export abstract class Company {
     return this._limitPolicy.getMonthlyLimit();
   }
 
-  canTransfer(amount: number, dailyUsed: number, monthlyUsed: number): boolean {
-    if (amount > this.getMaxTransferAmount()) {
+  canTransfer(amount: Money, dailyUsed: number, monthlyUsed: number): boolean {
+    if (amount.toNumber() > this.getMaxTransferAmount()) {
       return false;
     }
-    return this._limitPolicy.isTransferAllowed(amount, dailyUsed, monthlyUsed);
+    return this._limitPolicy.isTransferAllowed(
+      amount.toNumber(),
+      dailyUsed,
+      monthlyUsed,
+    );
   }
 
   toPlainObject() {
     return {
       id: this._id,
-      cuit: this._cuit,
+      cuit: this._cuit.toString(),
       businessName: this._businessName,
       joinedAt: this._joinedAt,
       type: this.getType(),
     };
-  }
-
-  private validateCuit(cuit: string): void {
-    const cuitPattern = /^\d{2}-\d{8}-\d$/;
-    if (!cuitPattern.test(cuit)) {
-      throw new Error('CUIT must follow the format XX-XXXXXXXX-X');
-    }
   }
 
   private validateBusinessName(businessName: string): void {

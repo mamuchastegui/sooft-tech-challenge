@@ -8,6 +8,8 @@ import { CompanyFactory } from '../../../src/domain/factories/company.factory';
 import { COMPANY_TYPES } from '../../../src/domain/value-objects/company-type.constants';
 import { CompanyEntity } from '../../../src/infrastructure/database/entities/company.entity';
 import { TransferEntity } from '../../../src/infrastructure/database/entities/transfer.entity';
+import { Cuit } from '../../../src/domain/value-objects/cuit.vo';
+import { Money } from '../../../src/domain/value-objects/money.vo';
 
 describe('CompanyRepositoryImpl', () => {
   let repository: CompanyRepositoryImpl;
@@ -54,10 +56,11 @@ describe('CompanyRepositoryImpl', () => {
 
       const companyEntity = {
         id: company.id,
-        cuit: '20-12345678-6',
+        cuit: Cuit.create('20-12345678-6'),
         businessName: 'Test PYME Company',
         joinedAt: expect.any(Date),
         type: COMPANY_TYPES.PYME,
+        transfers: [],
       };
 
       mockCompanyRepository.save.mockResolvedValue(
@@ -68,7 +71,7 @@ describe('CompanyRepositoryImpl', () => {
 
       expect(mockCompanyRepository.save).toHaveBeenCalled();
       expect(result.getType()).toBe(COMPANY_TYPES.PYME);
-      expect(result.calculateTransferFee(1000)).toBe(50);
+      expect(result.calculateTransferFee(Money.create(1000))).toBe(50);
     });
 
     it('should save a Corporate company successfully', async () => {
@@ -79,10 +82,11 @@ describe('CompanyRepositoryImpl', () => {
 
       const companyEntity = {
         id: company.id,
-        cuit: '30-87654321-0',
+        cuit: Cuit.create('30-87654321-0'),
         businessName: 'Test Corporate Company',
         joinedAt: expect.any(Date),
         type: COMPANY_TYPES.CORPORATE,
+        transfers: [],
       };
 
       mockCompanyRepository.save.mockResolvedValue(
@@ -93,7 +97,7 @@ describe('CompanyRepositoryImpl', () => {
 
       expect(mockCompanyRepository.save).toHaveBeenCalled();
       expect(result.getType()).toBe(COMPANY_TYPES.CORPORATE);
-      expect(result.calculateTransferFee(1000)).toBe(1);
+      expect(result.calculateTransferFee(Money.create(1000))).toBe(1);
     });
   });
 
@@ -101,10 +105,11 @@ describe('CompanyRepositoryImpl', () => {
     it('should return a PYME company when found', async () => {
       const companyEntity = {
         id: '1',
-        cuit: '20-12345678-6',
+        cuit: Cuit.create('20-12345678-6'),
         businessName: 'Test PYME Company',
         joinedAt: new Date(),
         type: COMPANY_TYPES.PYME,
+        transfers: [],
       };
 
       mockCompanyRepository.findOne.mockResolvedValue(
@@ -133,10 +138,11 @@ describe('CompanyRepositoryImpl', () => {
     it('should return a company when found by CUIT', async () => {
       const companyEntity = {
         id: '1',
-        cuit: '20-12345678-6',
+        cuit: Cuit.create('20-12345678-6'),
         businessName: 'Test Company',
         joinedAt: new Date(),
         type: COMPANY_TYPES.CORPORATE,
+        transfers: [],
       };
 
       mockCompanyRepository.findOne.mockResolvedValue(
@@ -146,7 +152,7 @@ describe('CompanyRepositoryImpl', () => {
       const result = await repository.findByCuit('20-12345678-6');
 
       expect(mockCompanyRepository.findOne).toHaveBeenCalledWith({
-        where: { cuit: '20-12345678-6' },
+        where: { cuit: Cuit.create('20-12345678-6') },
       });
       expect(result?.getType()).toBe(COMPANY_TYPES.CORPORATE);
     });
@@ -157,17 +163,19 @@ describe('CompanyRepositoryImpl', () => {
       const companyEntities = [
         {
           id: '1',
-          cuit: '20-12345678-6',
+          cuit: Cuit.create('20-12345678-6'),
           businessName: 'PYME Company',
           joinedAt: new Date(),
           type: COMPANY_TYPES.PYME,
+          transfers: [],
         },
         {
           id: '2',
-          cuit: '30-87654321-0',
+          cuit: Cuit.create('30-87654321-0'),
           businessName: 'Corporate Company',
           joinedAt: new Date(),
           type: COMPANY_TYPES.CORPORATE,
+          transfers: [],
         },
       ];
 
@@ -187,8 +195,10 @@ describe('CompanyRepositoryImpl', () => {
         (c) => c.getType() === COMPANY_TYPES.CORPORATE,
       );
 
-      expect(pymeCompany?.calculateTransferFee(1000)).toBe(50);
-      expect(corporateCompany?.calculateTransferFee(1000)).toBe(1);
+      expect(pymeCompany?.calculateTransferFee(Money.create(1000))).toBe(50);
+      expect(corporateCompany?.calculateTransferFee(Money.create(1000))).toBe(
+        1,
+      );
     });
   });
 

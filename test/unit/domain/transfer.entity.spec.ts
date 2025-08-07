@@ -1,104 +1,72 @@
 // test/unit/domain/transfer.entity.spec.ts
 
 import { Transfer } from '../../../src/domain/entities/transfer.entity';
+import { Money } from '../../../src/domain/value-objects/money.vo';
+import { AccountId } from '../../../src/domain/value-objects/account-id.vo';
+import { DomainError } from '../../../src/domain/errors/domain.error';
 
 describe('Transfer Entity', () => {
   describe('constructor', () => {
     it('should create a valid transfer', () => {
       const createdAt = new Date();
+      const amount = Money.create(1000.5);
+      const debitAccount = AccountId.create('1234567890123');
+      const creditAccount = AccountId.create('9876543210987');
 
       const transfer = new Transfer(
         '1',
-        1000.5,
+        amount,
         'company-1',
-        '001-123456-01',
-        '002-654321-02',
+        debitAccount,
+        creditAccount,
         createdAt,
       );
 
       expect(transfer.id).toBe('1');
-      expect(transfer.amount).toBe(1000.5);
+      expect(transfer.amount).toBe(amount);
       expect(transfer.companyId).toBe('company-1');
-      expect(transfer.debitAccount).toBe('001-123456-01');
-      expect(transfer.creditAccount).toBe('002-654321-02');
+      expect(transfer.debitAccount).toBe(debitAccount);
+      expect(transfer.creditAccount).toBe(creditAccount);
       expect(transfer.createdAt).toBe(createdAt);
     });
 
     it('should throw error for negative amount', () => {
       expect(() => {
-        new Transfer(
-          '1',
-          -100,
-          'company-1',
-          '001-123456-01',
-          '002-654321-02',
-          new Date(),
-        );
-      }).toThrow('Transfer amount must be greater than zero');
+        Money.create(-100);
+      }).toThrow(DomainError);
     });
 
-    it('should throw error for zero amount', () => {
+    it('should allow zero amount in Money VO', () => {
       expect(() => {
-        new Transfer(
-          '1',
-          0,
-          'company-1',
-          '001-123456-01',
-          '002-654321-02',
-          new Date(),
-        );
-      }).toThrow('Transfer amount must be greater than zero');
+        Money.create(0);
+      }).not.toThrow();
     });
 
     it('should throw error for invalid amount', () => {
       expect(() => {
-        new Transfer(
-          '1',
-          NaN,
-          'company-1',
-          '001-123456-01',
-          '002-654321-02',
-          new Date(),
-        );
-      }).toThrow('Transfer amount must be a valid number');
+        Money.create(NaN);
+      }).toThrow(DomainError);
     });
 
     it('should throw error for invalid debit account format', () => {
       expect(() => {
-        new Transfer(
-          '1',
-          1000,
-          'company-1',
-          '123456',
-          '002-654321-02',
-          new Date(),
-        );
-      }).toThrow('Invalid debit account format. Expected: XXX-XXXXXX-XX');
+        AccountId.create('123456');
+      }).toThrow(DomainError);
     });
 
     it('should throw error for invalid credit account format', () => {
       expect(() => {
-        new Transfer(
-          '1',
-          1000,
-          'company-1',
-          '001-123456-01',
-          '654321',
-          new Date(),
-        );
-      }).toThrow('Invalid credit account format. Expected: XXX-XXXXXX-XX');
+        AccountId.create('654321');
+      }).toThrow(DomainError);
     });
 
     it('should throw error for empty company ID', () => {
+      const amount = Money.create(1000);
+      const debitAccount = AccountId.create('1234567890123');
+      const creditAccount = AccountId.create('9876543210987');
+
       expect(() => {
-        new Transfer(
-          '1',
-          1000,
-          '',
-          '001-123456-01',
-          '002-654321-02',
-          new Date(),
-        );
+        new Transfer('1', amount, '', debitAccount, creditAccount, new Date());
       }).toThrow('Company ID cannot be empty');
     });
   });
@@ -106,13 +74,16 @@ describe('Transfer Entity', () => {
   describe('toPlainObject', () => {
     it('should return plain object representation', () => {
       const createdAt = new Date();
+      const amount = Money.create(1000.5);
+      const debitAccount = AccountId.create('1234567890123');
+      const creditAccount = AccountId.create('9876543210987');
 
       const transfer = new Transfer(
         '1',
-        1000.5,
+        amount,
         'company-1',
-        '001-123456-01',
-        '002-654321-02',
+        debitAccount,
+        creditAccount,
         createdAt,
       );
 
@@ -122,8 +93,8 @@ describe('Transfer Entity', () => {
         id: '1',
         amount: 1000.5,
         companyId: 'company-1',
-        debitAccount: '001-123456-01',
-        creditAccount: '002-654321-02',
+        debitAccount: '1234567890123',
+        creditAccount: '9876543210987',
         createdAt,
       });
     });

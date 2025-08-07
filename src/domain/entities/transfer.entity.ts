@@ -1,39 +1,18 @@
 // src/domain/entities/transfer.entity.ts
 
+import { Money } from '../value-objects/money.vo';
+import { AccountId } from '../value-objects/account-id.vo';
+
 export class Transfer {
   constructor(
     public readonly id: string,
-    public readonly amount: number,
+    public readonly amount: Money,
     public readonly companyId: string,
-    public readonly debitAccount: string,
-    public readonly creditAccount: string,
+    public readonly debitAccount: AccountId,
+    public readonly creditAccount: AccountId,
     public readonly createdAt: Date,
   ) {
-    this.validateAmount(amount);
-    this.validateAccount(debitAccount, 'debit');
-    this.validateAccount(creditAccount, 'credit');
     this.validateCompanyId(companyId);
-  }
-
-  private validateAmount(amount: number): void {
-    if (amount <= 0) {
-      throw new Error('Transfer amount must be greater than zero');
-    }
-    if (!Number.isFinite(amount)) {
-      throw new Error('Transfer amount must be a valid number');
-    }
-  }
-
-  private validateAccount(account: string, type: 'debit' | 'credit'): void {
-    if (!account || account.trim().length === 0) {
-      throw new Error(`${type} account cannot be empty`);
-    }
-    const accountRegex = /^\d{3}-\d{6}-\d{2}$/;
-    if (!accountRegex.test(account)) {
-      throw new Error(
-        `Invalid ${type} account format. Expected: XXX-XXXXXX-XX`,
-      );
-    }
   }
 
   private validateCompanyId(companyId: string): void {
@@ -45,10 +24,10 @@ export class Transfer {
   public toPlainObject() {
     return {
       id: this.id,
-      amount: this.amount,
+      amount: this.amount.toNumber(),
       companyId: this.companyId,
-      debitAccount: this.debitAccount,
-      creditAccount: this.creditAccount,
+      debitAccount: this.debitAccount.toString(),
+      creditAccount: this.creditAccount.toString(),
       createdAt: this.createdAt,
     };
   }

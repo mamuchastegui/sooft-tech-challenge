@@ -107,8 +107,8 @@ describe('CompanyController (e2e)', () => {
         .send(createCompanyDto)
         .expect(400)
         .expect((res) => {
-          const messageText = Array.isArray(res.body.message) 
-            ? res.body.message[0] 
+          const messageText = Array.isArray(res.body.message)
+            ? res.body.message[0]
             : res.body.message;
           expect(messageText).toContain('CUIT must follow the format');
         });

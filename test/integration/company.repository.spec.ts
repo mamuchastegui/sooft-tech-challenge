@@ -14,6 +14,7 @@ import { CompanyFactory } from '../../src/domain/factories/company.factory';
 import { PymeCompany } from '../../src/domain/entities/pyme-company.entity';
 import { CorporateCompany } from '../../src/domain/entities/corporate-company.entity';
 import { COMPANY_TYPES } from '../../src/domain/value-objects/company-type.constants';
+import { Money } from '../../src/domain/value-objects/money.vo';
 
 describe('CompanyRepository Integration', () => {
   let repository: CompanyRepositoryImpl;
@@ -65,7 +66,9 @@ describe('CompanyRepository Integration', () => {
 
       expect(retrievedCompany).toBeInstanceOf(PymeCompany);
       expect(retrievedCompany!.getType()).toBe(COMPANY_TYPES.PYME);
-      expect(retrievedCompany!.calculateTransferFee(1000)).toBe(50);
+      expect(retrievedCompany!.calculateTransferFee(Money.create(1000))).toBe(
+        50,
+      );
       expect(
         (retrievedCompany as PymeCompany).isEligibleForGovernmentSupport(),
       ).toBe(true);
@@ -82,7 +85,9 @@ describe('CompanyRepository Integration', () => {
 
       expect(retrievedCompany).toBeInstanceOf(CorporateCompany);
       expect(retrievedCompany!.getType()).toBe(COMPANY_TYPES.CORPORATE);
-      expect(retrievedCompany!.calculateTransferFee(1000)).toBe(1);
+      expect(retrievedCompany!.calculateTransferFee(Money.create(1000))).toBe(
+        1,
+      );
       expect(
         (retrievedCompany as CorporateCompany).requiresComplianceReporting(),
       ).toBe(true);
@@ -128,7 +133,7 @@ describe('CompanyRepository Integration', () => {
       const found = await repository.findByCuit(cuit);
 
       expect(found).toBeInstanceOf(PymeCompany);
-      expect(found!.cuit).toBe(cuit);
+      expect(found!.cuit.toString()).toBe(cuit);
     });
   });
 
@@ -173,8 +178,10 @@ describe('CompanyRepository Integration', () => {
       )) as CorporateCompany;
 
       // Different fee calculations
-      expect(retrievedPyme.calculateTransferFee(10000)).toBe(50);
-      expect(retrievedCorporate.calculateTransferFee(10000)).toBe(10);
+      expect(retrievedPyme.calculateTransferFee(Money.create(10000))).toBe(50);
+      expect(retrievedCorporate.calculateTransferFee(Money.create(10000))).toBe(
+        10,
+      );
 
       // Different document requirements
       expect(retrievedPyme.getRequiredDocuments()).toHaveLength(4);

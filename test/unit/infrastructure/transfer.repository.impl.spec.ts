@@ -6,6 +6,8 @@ import { Repository } from 'typeorm';
 import { TransferRepositoryImpl } from '../../../src/infrastructure/repositories/transfer.repository.impl';
 import { Transfer } from '../../../src/domain/entities/transfer.entity';
 import { TransferEntity } from '../../../src/infrastructure/database/entities/transfer.entity';
+import { Money } from '../../../src/domain/value-objects/money.vo';
+import { AccountId } from '../../../src/domain/value-objects/account-id.vo';
 
 describe('TransferRepositoryImpl', () => {
   let repository: TransferRepositoryImpl;
@@ -36,22 +38,27 @@ describe('TransferRepositoryImpl', () => {
 
   describe('save', () => {
     it('should save a transfer successfully', async () => {
+      const amount = Money.create(1000.5);
+      const debitAccount = AccountId.create('1234567890123');
+      const creditAccount = AccountId.create('9876543210987');
+
       const transfer = new Transfer(
         '1',
-        1000.5,
+        amount,
         'company-1',
-        '001-123456-01',
-        '002-654321-02',
+        debitAccount,
+        creditAccount,
         new Date(),
       );
 
       const transferEntity = {
         id: '1',
-        amount: 1000.5,
+        amount,
         companyId: 'company-1',
-        debitAccount: '001-123456-01',
-        creditAccount: '002-654321-02',
+        debitAccount,
+        creditAccount,
         createdAt: expect.any(Date),
+        company: undefined,
       };
 
       mockTransferRepository.create.mockReturnValue(
@@ -67,8 +74,8 @@ describe('TransferRepositoryImpl', () => {
         id: '1',
         amount: 1000.5,
         companyId: 'company-1',
-        debitAccount: '001-123456-01',
-        creditAccount: '002-654321-02',
+        debitAccount: '1234567890123',
+        creditAccount: '9876543210987',
         createdAt: expect.any(Date),
       });
       expect(mockTransferRepository.save).toHaveBeenCalledWith(transferEntity);
@@ -78,13 +85,18 @@ describe('TransferRepositoryImpl', () => {
 
   describe('findById', () => {
     it('should return a transfer when found', async () => {
+      const amount = Money.create(1000.5);
+      const debitAccount = AccountId.create('1234567890123');
+      const creditAccount = AccountId.create('9876543210987');
+
       const transferEntity = {
         id: '1',
-        amount: 1000.5,
+        amount,
         companyId: 'company-1',
-        debitAccount: '001-123456-01',
-        creditAccount: '002-654321-02',
+        debitAccount,
+        creditAccount,
         createdAt: new Date(),
+        company: undefined,
       };
 
       mockTransferRepository.findOne.mockResolvedValue(
@@ -111,14 +123,19 @@ describe('TransferRepositoryImpl', () => {
 
   describe('findByCompanyId', () => {
     it('should return transfers for a specific company', async () => {
+      const amount = Money.create(1000.5);
+      const debitAccount = AccountId.create('1234567890123');
+      const creditAccount = AccountId.create('9876543210987');
+
       const transferEntities = [
         {
           id: '1',
-          amount: 1000.5,
+          amount,
           companyId: 'company-1',
-          debitAccount: '001-123456-01',
-          creditAccount: '002-654321-02',
+          debitAccount,
+          creditAccount,
           createdAt: new Date(),
+          company: undefined,
         },
       ];
 
@@ -138,22 +155,31 @@ describe('TransferRepositoryImpl', () => {
 
   describe('findAll', () => {
     it('should return all transfers', async () => {
+      const amount1 = Money.create(1000.5);
+      const amount2 = Money.create(2500.75);
+      const debitAccount1 = AccountId.create('1234567890123');
+      const creditAccount1 = AccountId.create('9876543210987');
+      const debitAccount2 = AccountId.create('1111111111111');
+      const creditAccount2 = AccountId.create('2222222222222');
+
       const transferEntities = [
         {
           id: '1',
-          amount: 1000.5,
+          amount: amount1,
           companyId: 'company-1',
-          debitAccount: '001-123456-01',
-          creditAccount: '002-654321-02',
+          debitAccount: debitAccount1,
+          creditAccount: creditAccount1,
           createdAt: new Date(),
+          company: undefined,
         },
         {
           id: '2',
-          amount: 2500.75,
+          amount: amount2,
           companyId: 'company-2',
-          debitAccount: '003-789012-03',
-          creditAccount: '004-345678-04',
+          debitAccount: debitAccount2,
+          creditAccount: creditAccount2,
           createdAt: new Date(),
+          company: undefined,
         },
       ];
 

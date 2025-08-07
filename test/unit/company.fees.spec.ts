@@ -4,6 +4,7 @@ import { PymeCompany } from '../../src/domain/entities/pyme-company.entity';
 import { CorporateCompany } from '../../src/domain/entities/corporate-company.entity';
 import { CompanyFactory } from '../../src/domain/factories/company.factory';
 import { COMPANY_TYPES } from '../../src/domain/value-objects/company-type.constants';
+import { Money } from '../../src/domain/value-objects/money.vo';
 
 describe('Company Fee Calculation', () => {
   describe('PymeCompany', () => {
@@ -17,9 +18,9 @@ describe('Company Fee Calculation', () => {
     });
 
     it('should calculate flat fee for PYME transfers', () => {
-      expect(pymeCompany.calculateTransferFee(1000)).toBe(50);
-      expect(pymeCompany.calculateTransferFee(50000)).toBe(50);
-      expect(pymeCompany.calculateTransferFee(100000)).toBe(50);
+      expect(pymeCompany.calculateTransferFee(Money.create(1000))).toBe(50);
+      expect(pymeCompany.calculateTransferFee(Money.create(50000))).toBe(50);
+      expect(pymeCompany.calculateTransferFee(Money.create(100000))).toBe(50);
     });
 
     it('should have correct transfer limits for PYME', () => {
@@ -29,10 +30,16 @@ describe('Company Fee Calculation', () => {
     });
 
     it('should validate transfer limits correctly', () => {
-      expect(pymeCompany.canTransfer(30000, 10000, 100000)).toBe(true);
-      expect(pymeCompany.canTransfer(30000, 30000, 100000)).toBe(false); // Exceeds daily
-      expect(pymeCompany.canTransfer(30000, 10000, 480000)).toBe(false); // Exceeds monthly
-      expect(pymeCompany.canTransfer(150000, 0, 0)).toBe(false); // Exceeds max transfer
+      expect(pymeCompany.canTransfer(Money.create(30000), 10000, 100000)).toBe(
+        true,
+      );
+      expect(pymeCompany.canTransfer(Money.create(30000), 30000, 100000)).toBe(
+        false,
+      ); // Exceeds daily
+      expect(pymeCompany.canTransfer(Money.create(30000), 10000, 480000)).toBe(
+        false,
+      ); // Exceeds monthly
+      expect(pymeCompany.canTransfer(Money.create(150000), 0, 0)).toBe(false); // Exceeds max transfer
     });
 
     it('should be eligible for government support', () => {
@@ -55,10 +62,16 @@ describe('Company Fee Calculation', () => {
     });
 
     it('should calculate tiered fees for Corporate transfers', () => {
-      expect(corporateCompany.calculateTransferFee(5000)).toBe(5); // 0.1% up to 10k
-      expect(corporateCompany.calculateTransferFee(10000)).toBe(10); // 0.1% up to 10k
-      expect(corporateCompany.calculateTransferFee(50000)).toBe(250); // 0.5% from 10k-100k
-      expect(corporateCompany.calculateTransferFee(200000)).toBe(2000); // 1.0% above 100k
+      expect(corporateCompany.calculateTransferFee(Money.create(5000))).toBe(5); // 0.1% up to 10k
+      expect(corporateCompany.calculateTransferFee(Money.create(10000))).toBe(
+        10,
+      ); // 0.1% up to 10k
+      expect(corporateCompany.calculateTransferFee(Money.create(50000))).toBe(
+        250,
+      ); // 0.5% from 10k-100k
+      expect(corporateCompany.calculateTransferFee(Money.create(200000))).toBe(
+        2000,
+      ); // 1.0% above 100k
     });
 
     it('should have correct transfer limits for Corporate', () => {
@@ -68,10 +81,18 @@ describe('Company Fee Calculation', () => {
     });
 
     it('should validate transfer limits correctly', () => {
-      expect(corporateCompany.canTransfer(500000, 200000, 2000000)).toBe(true);
-      expect(corporateCompany.canTransfer(500000, 800000, 2000000)).toBe(false); // Exceeds daily
-      expect(corporateCompany.canTransfer(500000, 200000, 9800000)).toBe(false); // Exceeds monthly
-      expect(corporateCompany.canTransfer(1500000, 0, 0)).toBe(false); // Exceeds max transfer
+      expect(
+        corporateCompany.canTransfer(Money.create(500000), 200000, 2000000),
+      ).toBe(true);
+      expect(
+        corporateCompany.canTransfer(Money.create(500000), 800000, 2000000),
+      ).toBe(false); // Exceeds daily
+      expect(
+        corporateCompany.canTransfer(Money.create(500000), 200000, 9800000),
+      ).toBe(false); // Exceeds monthly
+      expect(corporateCompany.canTransfer(Money.create(1500000), 0, 0)).toBe(
+        false,
+      ); // Exceeds max transfer
     });
 
     it('should not be eligible for government support', () => {

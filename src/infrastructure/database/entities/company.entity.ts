@@ -8,14 +8,20 @@ import {
   CreateDateColumn,
 } from 'typeorm';
 import { TransferEntity } from './transfer.entity';
+import { Cuit } from '../../../domain/value-objects/cuit.vo';
+import { CuitTransformer } from '../transformers/cuit.transformer';
 
 @Entity('companies')
 export abstract class CompanyEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ unique: true, length: 13 })
-  cuit: string;
+  @Column('varchar', {
+    unique: true,
+    length: 13,
+    transformer: new CuitTransformer(),
+  })
+  cuit: Cuit;
 
   @Column({ name: 'business_name', length: 255 })
   businessName: string;

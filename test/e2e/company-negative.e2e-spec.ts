@@ -112,9 +112,9 @@ describe('CompanyController Negative Paths (e2e)', () => {
       const response = await request(app.getHttpServer())
         .get('/v1/companies')
         .expect(200);
-      
+
       const existingCompany = response.body[0];
-      
+
       // Try to create a company with an existing CUIT
       await request(app.getHttpServer())
         .post('/v1/companies')
