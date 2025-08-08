@@ -1,6 +1,6 @@
 // src/app.module.ts
 
-import { Module } from '@nestjs/common';
+import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { CompanyController } from './presentation/controllers/company.controller';
 import { ReportController } from './presentation/controllers/report.controller';
@@ -14,6 +14,11 @@ import { DatabaseModule } from './infrastructure/database/database.module';
 import { DateProvider } from './infrastructure/providers/date.provider';
 import { COMPANY_REPOSITORY_TOKEN } from './domain/repositories/company.repository.token';
 import { TRANSFER_REPOSITORY_TOKEN } from './domain/repositories/transfer.repository.token';
+import { LoggingModule } from './infrastructure/logging/logging.module';
+import { TracingModule } from './infrastructure/tracing/tracing.module';
+import { MetricsModule } from './infrastructure/metrics/metrics.module';
+import { HealthModule } from './infrastructure/health/health.module';
+import { RequestIdMiddleware } from './presentation/middleware/request-id.middleware';
 
 @Module({
   imports: [
@@ -21,6 +26,10 @@ import { TRANSFER_REPOSITORY_TOKEN } from './domain/repositories/transfer.reposi
       isGlobal: true,
     }),
     DatabaseModule,
+    LoggingModule,
+    TracingModule.forRoot(),
+    MetricsModule,
+    HealthModule,
   ],
   controllers: [CompanyController, ReportController],
   providers: [
@@ -39,4 +48,8 @@ import { TRANSFER_REPOSITORY_TOKEN } from './domain/repositories/transfer.reposi
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer): void {
+    consumer.apply(RequestIdMiddleware).forRoutes('*');
+  }
+}

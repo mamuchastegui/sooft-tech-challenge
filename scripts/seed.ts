@@ -9,6 +9,31 @@ import { v4 as uuidv4 } from 'uuid';
 import { CompanyEntity } from '../src/infrastructure/database/entities/company.entity';
 import { TransferEntity } from '../src/infrastructure/database/entities/transfer.entity';
 import { getDatabaseConfig } from '../src/infrastructure/database/database.config';
+import { Cuit } from '../src/domain/value-objects/cuit.vo';
+import { Money } from '../src/domain/value-objects/money.vo';
+import { AccountId } from '../src/domain/value-objects/account-id.vo';
+
+// Helper function to generate valid CUIT
+function generateValidCuit(): string {
+  // Use known valid CUITs to avoid calculation errors
+  const validCuits = [
+    '20-12345678-6',
+    '27-12345678-0', 
+    '30-50123456-3',
+    '20-11111111-2',
+    '27-95555554-1',
+    '30-12345678-1',
+    '20-00000006-0',
+    '20-00000001-9'
+  ];
+  
+  return faker.helpers.arrayElement(validCuits);
+}
+
+// Helper function to generate valid AccountId (13 digits)
+function generateValidAccountId(): string {
+  return faker.string.numeric(13);
+}
 
 async function seed() {
   const config = getDatabaseConfig();
@@ -24,11 +49,19 @@ async function seed() {
 
     // ---------- create companies ----------
     const companies: CompanyEntity[] = [];
+    const validCuits = [
+      '20-12345678-6',
+      '27-12345678-0', 
+      '30-50123456-3',
+      '20-11111111-2',
+      '27-95555554-1'
+    ];
+    
     for (let i = 0; i < 5; i++) {
       const isPyme = i < 3;
       const company = dataSource.getRepository(CompanyEntity).create({
         id: uuidv4(),
-        cuit: faker.string.numeric(2) + '-' + faker.string.numeric(8) + '-' + faker.string.numeric(1),
+        cuit: Cuit.create(validCuits[i]), // Use unique CUIT for each company
         businessName: faker.company.name(),
         joinedAt: faker.date.recent({ days: 120 }),   // within last 4 months
         type: isPyme ? 'PYME' : 'CORPORATE',
@@ -48,13 +81,13 @@ async function seed() {
         const transfer = dataSource.getRepository(TransferEntity).create({
           id: uuidv4(),
           companyId: c.id,
-          amount: parseFloat(faker.finance.amount({ 
+          amount: Money.create(parseFloat(faker.finance.amount({ 
             min: 100, 
             max: c.type === 'PYME' ? 100_000 : 1_000_000,
             dec: 2
-          })),
-          debitAccount: faker.finance.accountNumber(13),
-          creditAccount: faker.finance.accountNumber(13),
+          }))),
+          debitAccount: AccountId.create(generateValidAccountId()),
+          creditAccount: AccountId.create(generateValidAccountId()),
         });
         transfers.push(transfer);
       }

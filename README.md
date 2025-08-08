@@ -154,3 +154,19 @@ PORT=3000
 ```
 
 **Documentación Swagger**: http://localhost:3000/api (cuando la app esté ejecutándose)
+
+## Observabilidad
+
+La aplicación incluye observabilidad completa con structured logging, métricas y tracing:
+
+- **Structured Logging** (Pino): Logs JSON con request IDs y contexto enriquecido
+- **Health Checks**: `/health`, `/health/ready`, `/health/live` para liveness/readiness probes  
+- **Metrics** (Prometheus): `/metrics` endpoint con métricas de negocio y sistema
+- **Distributed Tracing** (OpenTelemetry): Configurable via `OTEL_EXPORTER_OTLP_ENDPOINT`
+
+Variables de entorno de observabilidad:
+```bash
+LOG_LEVEL=info
+OTEL_SERVICE_NAME=sooft-tech-backend
+OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318  # opcional
+```
