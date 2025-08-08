@@ -16,7 +16,7 @@ export class CompanyMapper {
   static toDomain(entity: CompanyEntity): Company {
     return CompanyFactory.create({
       id: entity.id,
-      cuit: entity.cuit, // Already a Cuit VO from transformer
+      cuit: entity.cuit, // Already a Cuit object from transformer
       businessName: entity.businessName,
       type: entity.type as CompanyType,
       joinedAt: entity.joinedAt,
@@ -37,7 +37,7 @@ export class CompanyMapper {
     }
 
     entity.id = domain.id;
-    entity.cuit = domain.cuit; // Cuit VO will be handled by transformer
+    entity.cuit = domain.cuit; // Cuit object will be handled by transformer
     entity.businessName = domain.businessName;
     entity.joinedAt = domain.joinedAt;
     entity.type = domain.getType();

@@ -2,7 +2,7 @@
 
 import { Company } from '../entities/company.base';
 import { CompanyFilter } from '../../application/services/company-query.service';
-import { Cuit } from '../value-objects/cuit.vo';
+import { Cuit } from '../value-objects/cuit';
 
 export interface CompanyRepository {
   save(company: Company): Promise<Company>;

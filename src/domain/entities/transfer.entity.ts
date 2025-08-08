@@ -1,7 +1,7 @@
 // src/domain/entities/transfer.entity.ts
 
-import { Money } from '../value-objects/money.vo';
-import { AccountId } from '../value-objects/account-id.vo';
+import { Money } from '../value-objects/money';
+import { AccountId } from '../value-objects/account-id';
 
 export class Transfer {
   constructor(

@@ -8,7 +8,7 @@ import {
   CreateDateColumn,
 } from 'typeorm';
 import { TransferEntity } from './transfer.entity';
-import { Cuit } from '../../../domain/value-objects/cuit.vo';
+import { Cuit } from '../../../domain/value-objects/cuit';
 import { CuitTransformer } from '../transformers/cuit.transformer';
 
 @Entity('companies')

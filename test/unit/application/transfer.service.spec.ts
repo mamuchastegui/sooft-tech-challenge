@@ -7,8 +7,8 @@ import { TransferRepository } from '../../../src/domain/repositories/transfer.re
 import { Transfer } from '../../../src/domain/entities/transfer.entity';
 import { TRANSFER_REPOSITORY_TOKEN } from '../../../src/domain/repositories/transfer.repository.token';
 import { COMPANY_REPOSITORY_TOKEN } from '../../../src/domain/repositories/company.repository.token';
-import { Money } from '../../../src/domain/value-objects/money.vo';
-import { AccountId } from '../../../src/domain/value-objects/account-id.vo';
+import { Money } from '../../../src/domain/value-objects/money';
+import { AccountId } from '../../../src/domain/value-objects/account-id';
 
 describe('TransferService', () => {
   let service: TransferService;

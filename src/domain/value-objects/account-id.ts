@@ -1,4 +1,4 @@
-// src/domain/value-objects/account-id.vo.ts
+// src/domain/value-objects/account-id.ts
 
 import { DomainError } from '../errors/domain.error';
 

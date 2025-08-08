@@ -1,6 +1,6 @@
 // test/unit/value-objects/money.vo.spec.ts
 
-import { Money } from '../../../src/domain/value-objects/money.vo';
+import { Money } from '../../../src/domain/value-objects/money';
 import { DomainError } from '../../../src/domain/errors/domain.error';
 
 describe('Money Value Object', () => {

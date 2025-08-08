@@ -3,8 +3,8 @@
 import { FeePolicy } from '../policies/fee-policy.interface';
 import { TransferLimitPolicy } from '../policies/transfer-limit-policy.interface';
 import { CompanyType } from '../value-objects/company-type.constants';
-import { Cuit } from '../value-objects/cuit.vo';
-import { Money } from '../value-objects/money.vo';
+import { Cuit } from '../value-objects/cuit';
+import { Money } from '../value-objects/money';
 
 export abstract class Company {
   protected constructor(

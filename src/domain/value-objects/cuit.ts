@@ -1,4 +1,4 @@
-// src/domain/value-objects/cuit.vo.ts
+// src/domain/value-objects/cuit.ts
 
 import { DomainError } from '../errors/domain.error';
 

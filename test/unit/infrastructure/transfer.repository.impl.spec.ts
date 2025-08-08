@@ -6,8 +6,8 @@ import { Repository } from 'typeorm';
 import { TransferRepositoryImpl } from '../../../src/infrastructure/repositories/transfer.repository.impl';
 import { Transfer } from '../../../src/domain/entities/transfer.entity';
 import { TransferEntity } from '../../../src/infrastructure/database/entities/transfer.entity';
-import { Money } from '../../../src/domain/value-objects/money.vo';
-import { AccountId } from '../../../src/domain/value-objects/account-id.vo';
+import { Money } from '../../../src/domain/value-objects/money';
+import { AccountId } from '../../../src/domain/value-objects/account-id';
 
 describe('TransferRepositoryImpl', () => {
   let repository: TransferRepositoryImpl;

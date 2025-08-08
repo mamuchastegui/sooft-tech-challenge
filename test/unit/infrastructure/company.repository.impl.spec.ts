@@ -8,8 +8,8 @@ import { CompanyFactory } from '../../../src/domain/factories/company.factory';
 import { COMPANY_TYPES } from '../../../src/domain/value-objects/company-type.constants';
 import { CompanyEntity } from '../../../src/infrastructure/database/entities/company.entity';
 import { TransferEntity } from '../../../src/infrastructure/database/entities/transfer.entity';
-import { Cuit } from '../../../src/domain/value-objects/cuit.vo';
-import { Money } from '../../../src/domain/value-objects/money.vo';
+import { Cuit } from '../../../src/domain/value-objects/cuit';
+import { Money } from '../../../src/domain/value-objects/money';
 
 describe('CompanyRepositoryImpl', () => {
   let repository: CompanyRepositoryImpl;

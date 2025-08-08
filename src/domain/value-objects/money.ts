@@ -1,4 +1,4 @@
-// src/domain/value-objects/money.vo.ts
+// src/domain/value-objects/money.ts
 
 import { DomainError } from '../errors/domain.error';
 

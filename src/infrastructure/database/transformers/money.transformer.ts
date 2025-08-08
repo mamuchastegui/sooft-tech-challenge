@@ -1,7 +1,7 @@
 // src/infrastructure/database/transformers/money.transformer.ts
 
 import { ValueTransformer } from 'typeorm';
-import { Money } from '../../../domain/value-objects/money.vo';
+import { Money } from '../../../domain/value-objects/money';
 
 export class MoneyTransformer implements ValueTransformer {
   to(value: Money | null): number | null {

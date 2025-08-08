@@ -9,9 +9,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { CompanyEntity } from '../src/infrastructure/database/entities/company.entity';
 import { TransferEntity } from '../src/infrastructure/database/entities/transfer.entity';
 import { getDatabaseConfig } from '../src/infrastructure/database/database.config';
-import { Cuit } from '../src/domain/value-objects/cuit.vo';
-import { Money } from '../src/domain/value-objects/money.vo';
-import { AccountId } from '../src/domain/value-objects/account-id.vo';
+import { Cuit } from '../src/domain/value-objects/cuit';
+import { Money } from '../src/domain/value-objects/money';
+import { AccountId } from '../src/domain/value-objects/account-id';
 
 // Helper function to generate valid CUIT
 function generateValidCuit(): string {

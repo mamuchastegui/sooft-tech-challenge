@@ -9,8 +9,8 @@ import {
   CreateDateColumn,
 } from 'typeorm';
 import { CompanyEntity } from './company.entity';
-import { Money } from '../../../domain/value-objects/money.vo';
-import { AccountId } from '../../../domain/value-objects/account-id.vo';
+import { Money } from '../../../domain/value-objects/money';
+import { AccountId } from '../../../domain/value-objects/account-id';
 import { MoneyTransformer } from '../transformers/money.transformer';
 import { AccountIdTransformer } from '../transformers/account-id.transformer';
 

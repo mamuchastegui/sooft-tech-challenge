@@ -1,7 +1,7 @@
 // src/infrastructure/database/transformers/cuit.transformer.ts
 
 import { ValueTransformer } from 'typeorm';
-import { Cuit } from '../../../domain/value-objects/cuit.vo';
+import { Cuit } from '../../../domain/value-objects/cuit';
 
 export class CuitTransformer implements ValueTransformer {
   to(value: Cuit | null): string | null {

@@ -11,7 +11,7 @@ import { TransferEntity } from '../database/entities/transfer.entity';
 import { CompanyMapper } from '../mappers/company.mapper';
 import { CompanyFactory } from '../../domain/factories/company.factory';
 import { CompanyType } from '../../domain/value-objects/company-type.constants';
-import { Cuit } from '../../domain/value-objects/cuit.vo';
+import { Cuit } from '../../domain/value-objects/cuit';
 
 @Injectable()
 export class CompanyRepositoryImpl implements CompanyRepository {
@@ -36,7 +36,7 @@ export class CompanyRepositoryImpl implements CompanyRepository {
   }
 
   async findByCuit(cuit: string | Cuit): Promise<Company | null> {
-    // TypeORM will handle the transformation, so we can pass the VO directly
+    // TypeORM will handle the transformation, so we can pass the object directly
     const cuitToSearch = typeof cuit === 'string' ? Cuit.create(cuit) : cuit;
     const entity = await this.companyEntityRepository.findOne({
       where: { cuit: cuitToSearch },

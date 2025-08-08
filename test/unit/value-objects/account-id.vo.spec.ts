@@ -1,6 +1,6 @@
 // test/unit/value-objects/account-id.vo.spec.ts
 
-import { AccountId } from '../../../src/domain/value-objects/account-id.vo';
+import { AccountId } from '../../../src/domain/value-objects/account-id';
 import { DomainError } from '../../../src/domain/errors/domain.error';
 
 describe('AccountId Value Object', () => {

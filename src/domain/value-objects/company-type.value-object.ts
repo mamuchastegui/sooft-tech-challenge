@@ -1,15 +1,12 @@
 // src/domain/value-objects/company-type.value-object.ts
 
-export enum CompanyType {
-  PYME = 'PYME',
-  CORPORATE = 'CORPORATE',
-}
+import { COMPANY_TYPES, CompanyType } from './company-type.constants';
 
-export class CompanyTypeVO {
+export class CompanyTypeValueObject {
   private readonly value: CompanyType;
 
   constructor(value: string) {
-    if (!Object.values(CompanyType).includes(value as CompanyType)) {
+    if (!Object.values(COMPANY_TYPES).includes(value as CompanyType)) {
       throw new Error(`Invalid company type: ${value}`);
     }
     this.value = value as CompanyType;
@@ -23,7 +20,7 @@ export class CompanyTypeVO {
     return this.value;
   }
 
-  equals(other: CompanyTypeVO): boolean {
+  equals(other: CompanyTypeValueObject): boolean {
     return this.value === other.value;
   }
 }

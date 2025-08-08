@@ -8,7 +8,7 @@ import {
   COMPANY_TYPES,
   CompanyType,
 } from '../value-objects/company-type.constants';
-import { Cuit } from '../value-objects/cuit.vo';
+import { Cuit } from '../value-objects/cuit';
 
 export interface CreateCompanyData {
   cuit: string | Cuit;
@@ -41,10 +41,10 @@ export class CompanyFactory {
     joinedAt?: Date,
     id?: string,
   ): PymeCompany {
-    const cuitVO = typeof cuit === 'string' ? Cuit.create(cuit) : cuit;
+    const cuitValue = typeof cuit === 'string' ? Cuit.create(cuit) : cuit;
     return new PymeCompany(
       id || uuidv4(),
-      cuitVO,
+      cuitValue,
       businessName,
       joinedAt || new Date(),
     );
@@ -56,10 +56,10 @@ export class CompanyFactory {
     joinedAt?: Date,
     id?: string,
   ): CorporateCompany {
-    const cuitVO = typeof cuit === 'string' ? Cuit.create(cuit) : cuit;
+    const cuitValue = typeof cuit === 'string' ? Cuit.create(cuit) : cuit;
     return new CorporateCompany(
       id || uuidv4(),
-      cuitVO,
+      cuitValue,
       businessName,
       joinedAt || new Date(),
     );

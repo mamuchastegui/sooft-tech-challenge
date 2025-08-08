@@ -7,7 +7,7 @@ import {
   COMPANY_TYPES,
   CompanyType,
 } from '../value-objects/company-type.constants';
-import { Cuit } from '../value-objects/cuit.vo';
+import { Cuit } from '../value-objects/cuit';
 
 export class CorporateCompany extends Company {
   constructor(id: string, cuit: Cuit, businessName: string, joinedAt: Date) {

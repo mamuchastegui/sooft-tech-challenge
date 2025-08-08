@@ -4,7 +4,7 @@ import { PymeCompany } from '../../src/domain/entities/pyme-company.entity';
 import { CorporateCompany } from '../../src/domain/entities/corporate-company.entity';
 import { CompanyFactory } from '../../src/domain/factories/company.factory';
 import { COMPANY_TYPES } from '../../src/domain/value-objects/company-type.constants';
-import { Money } from '../../src/domain/value-objects/money.vo';
+import { Money } from '../../src/domain/value-objects/money';
 
 describe('Company Fee Calculation', () => {
   describe('PymeCompany', () => {

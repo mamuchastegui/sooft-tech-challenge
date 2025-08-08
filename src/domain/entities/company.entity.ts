@@ -1,6 +1,6 @@
 // src/domain/entities/company.entity.ts
 
-import { CompanyTypeVO } from '../value-objects/company-type.value-object';
+import { CompanyTypeValueObject } from '../value-objects/company-type.value-object';
 
 export class Company {
   constructor(
@@ -8,7 +8,7 @@ export class Company {
     public readonly cuit: string,
     public readonly businessName: string,
     public readonly joinedAt: Date,
-    public readonly type: CompanyTypeVO,
+    public readonly type: CompanyTypeValueObject,
   ) {
     this.validateCuit(cuit);
     this.validateBusinessName(businessName);

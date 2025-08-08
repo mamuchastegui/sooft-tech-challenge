@@ -1,6 +1,6 @@
 // test/unit/value-objects/cuit.vo.spec.ts
 
-import { Cuit } from '../../../src/domain/value-objects/cuit.vo';
+import { Cuit } from '../../../src/domain/value-objects/cuit';
 import { DomainError } from '../../../src/domain/errors/domain.error';
 
 describe('Cuit Value Object', () => {

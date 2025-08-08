@@ -1,8 +1,8 @@
 // test/unit/domain/transfer.entity.spec.ts
 
 import { Transfer } from '../../../src/domain/entities/transfer.entity';
-import { Money } from '../../../src/domain/value-objects/money.vo';
-import { AccountId } from '../../../src/domain/value-objects/account-id.vo';
+import { Money } from '../../../src/domain/value-objects/money';
+import { AccountId } from '../../../src/domain/value-objects/account-id';
 import { DomainError } from '../../../src/domain/errors/domain.error';
 
 describe('Transfer Entity', () => {
@@ -36,7 +36,7 @@ describe('Transfer Entity', () => {
       }).toThrow(DomainError);
     });
 
-    it('should allow zero amount in Money VO', () => {
+    it('should allow zero amount in Money object', () => {
       expect(() => {
         Money.create(0);
       }).not.toThrow();

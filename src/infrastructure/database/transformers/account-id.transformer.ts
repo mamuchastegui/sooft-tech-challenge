@@ -1,7 +1,7 @@
 // src/infrastructure/database/transformers/account-id.transformer.ts
 
 import { ValueTransformer } from 'typeorm';
-import { AccountId } from '../../../domain/value-objects/account-id.vo';
+import { AccountId } from '../../../domain/value-objects/account-id';
 
 export class AccountIdTransformer implements ValueTransformer {
   to(value: AccountId | null): string | null {

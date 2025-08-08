@@ -12,8 +12,8 @@ import { CreateTransferDto } from '../dto/create-transfer.dto';
 import { CompanyRepository } from '../../domain/repositories/company.repository.interface';
 import { TRANSFER_REPOSITORY_TOKEN } from '../../domain/repositories/transfer.repository.token';
 import { COMPANY_REPOSITORY_TOKEN } from '../../domain/repositories/company.repository.token';
-import { Money } from '../../domain/value-objects/money.vo';
-import { AccountId } from '../../domain/value-objects/account-id.vo';
+import { Money } from '../../domain/value-objects/money';
+import { AccountId } from '../../domain/value-objects/account-id';
 import { Transfer } from '../../domain/entities/transfer.entity';
 import { v4 as uuidv4 } from 'uuid';
 
