@@ -64,7 +64,7 @@ describe('CompanyQueryService', () => {
 
       expect(mockRepository.findCompaniesByFilter).toHaveBeenCalledWith({});
       expect(result).toHaveLength(1);
-      expect(result[0].businessName).toBe('Test Company');
+      expect(result[0].name).toBe('Test Company');
     });
 
     it('should find companies with joinedAfter filter', async () => {

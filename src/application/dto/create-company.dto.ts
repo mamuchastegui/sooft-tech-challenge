@@ -1,11 +1,12 @@
 // src/application/dto/create-company.dto.ts
 
-import { IsNotEmpty, IsString, Matches, IsIn } from 'class-validator';
+import { IsNotEmpty, IsString, Matches, IsIn, IsNumber, IsPositive, Validate } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import {
   CompanyType,
   COMPANY_TYPES,
 } from '../../domain/value-objects/company-type.constants';
+import { CuitValidator } from './validators/cuit.validator';
 
 export class CreateCompanyDto {
   @ApiProperty({
@@ -15,9 +16,7 @@ export class CreateCompanyDto {
   })
   @IsNotEmpty()
   @IsString()
-  @Matches(/^\d{2}-\d{8}-\d{1}$/, {
-    message: 'CUIT must follow the format XX-XXXXXXXX-X',
-  })
+  @Validate(CuitValidator)
   cuit: string;
 
   @ApiProperty({
@@ -28,7 +27,7 @@ export class CreateCompanyDto {
   })
   @IsNotEmpty()
   @IsString()
-  businessName: string;
+  name: string;
 
   @ApiProperty({
     description: 'Tipo de empresa',

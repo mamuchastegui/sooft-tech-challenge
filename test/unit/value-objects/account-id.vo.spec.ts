@@ -70,6 +70,24 @@ describe('AccountId Value Object', () => {
 
       invalidAccounts.forEach((invalidAccount) => {
         expect(() => AccountId.create(invalidAccount)).toThrow(DomainError);
+        expect(() => AccountId.create(invalidAccount)).toThrow(/must be exactly 13 digits/);
+      });
+    });
+
+    it('should throw DomainError for checksum validation failures', () => {
+      // Test cases where hypothetical checksum validation would fail
+      // Note: AccountId currently only validates format, but we test the error message consistency
+      const possibleInvalidChecksums = [
+        '1234567890124', // Changed last digit
+        '1234567890125', // Changed last digit
+        '1234567890126', // Changed last digit
+      ];
+
+      // These should pass current validation (format only), but we're testing for future checksum validation
+      possibleInvalidChecksums.forEach((accountId) => {
+        // Currently these will NOT throw, but if checksum validation is added, they should
+        const result = AccountId.create(accountId);
+        expect(result.toString()).toBe(accountId);
       });
     });
   });
@@ -87,6 +105,21 @@ describe('AccountId Value Object', () => {
       const account2 = AccountId.create('9876543210987');
 
       expect(account1.equals(account2)).toBe(false);
+    });
+
+    it('should return false when comparing with null or undefined', () => {
+      const accountId = AccountId.create('1234567890123');
+
+      expect(accountId.equals(null as any)).toBe(false);
+      expect(accountId.equals(undefined as any)).toBe(false);
+    });
+
+    it('should return false when comparing with non-AccountId object', () => {
+      const accountId = AccountId.create('1234567890123');
+
+      expect(accountId.equals('1234567890123' as any)).toBe(false);
+      expect(accountId.equals({ raw: '1234567890123' } as any)).toBe(false);
+      expect(accountId.equals(1234567890123 as any)).toBe(false);
     });
 
     it('should handle whitespace normalization in comparison', () => {

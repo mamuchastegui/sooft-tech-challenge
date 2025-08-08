@@ -13,7 +13,13 @@ module.exports = {
   ],
   coverageDirectory: './coverage',
   testEnvironment: 'node',
-  moduleNameMapping: {
-    '^src/(.*)$': '<rootDir>/src/$1',
+  modulePathIgnorePatterns: ['<rootDir>/dist/'],
+  coverageThreshold: {
+    global: {
+      statements: 85,
+      branches: 75,
+      functions: 85,
+      lines: 85,
+    },
   },
 };

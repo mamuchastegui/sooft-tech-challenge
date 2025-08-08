@@ -54,14 +54,14 @@ describe('CompanyController Negative Paths (e2e)', () => {
         .post('/v1/companies')
         .send({
           cuit: uniqueCuit,
-          businessName: 'ACME Corp',
+          name: 'ACME Corp',
           type: COMPANY_TYPES.PYME,
         })
         .expect(201)
         .expect((res) => {
           expect(res.body.cuit).toBe(uniqueCuit);
           expect(res.body.type).toBe(COMPANY_TYPES.PYME);
-          expect(res.body.businessName).toBe('ACME Corp');
+          expect(res.body.name).toBe('ACME Corp');
           expect(res.body.id).toBeDefined();
         });
 
@@ -70,7 +70,7 @@ describe('CompanyController Negative Paths (e2e)', () => {
         .post('/v1/companies')
         .send({
           cuit: uniqueCuit,
-          businessName: 'ACME 2 LLC',
+          name: 'ACME 2 LLC',
           type: COMPANY_TYPES.CORPORATE,
         })
         .expect(409)
@@ -88,7 +88,7 @@ describe('CompanyController Negative Paths (e2e)', () => {
         .post('/v1/companies')
         .send({
           cuit: duplicateCuit,
-          businessName: 'Original Company SA',
+          name: 'Original Company SA',
           type: COMPANY_TYPES.CORPORATE,
         })
         .expect(201);
@@ -98,7 +98,7 @@ describe('CompanyController Negative Paths (e2e)', () => {
         .post('/v1/companies')
         .send({
           cuit: duplicateCuit,
-          businessName: 'Different Name SRL',
+          name: 'Different Name SRL',
           type: COMPANY_TYPES.PYME,
         })
         .expect(409)
@@ -120,7 +120,7 @@ describe('CompanyController Negative Paths (e2e)', () => {
         .post('/v1/companies')
         .send({
           cuit: existingCompany.cuit,
-          businessName: 'Trying to duplicate seed data',
+          name: 'Trying to duplicate seed data',
           type: COMPANY_TYPES.PYME,
         })
         .expect((res) => {
@@ -237,7 +237,7 @@ describe('CompanyController Negative Paths (e2e)', () => {
         .post('/v1/companies')
         .send({
           cuit: '12345',
-          businessName: 'Test Company',
+          name: 'Test Company',
           type: COMPANY_TYPES.PYME,
         })
         .expect(400)
@@ -253,7 +253,7 @@ describe('CompanyController Negative Paths (e2e)', () => {
         .post('/v1/companies')
         .send({
           cuit: '30-11111111-1',
-          businessName: '',
+          name: '',
           type: COMPANY_TYPES.CORPORATE,
         })
         .expect(400)
@@ -271,7 +271,7 @@ describe('CompanyController Negative Paths (e2e)', () => {
         .post('/v1/companies')
         .send({
           cuit: '30-22222222-2',
-          businessName: 'Test Company',
+          name: 'Test Company',
           type: 'INVALID_TYPE',
         })
         .expect(400)
@@ -287,7 +287,7 @@ describe('CompanyController Negative Paths (e2e)', () => {
         .post('/v1/companies')
         .send({
           cuit: null,
-          businessName: null,
+          name: null,
           type: null,
         })
         .expect(400)
@@ -306,7 +306,7 @@ describe('CompanyController Negative Paths (e2e)', () => {
         .post('/v1/companies')
         .send({
           cuit: '30-33333333-3',
-          businessName: 'Test Company',
+          name: 'Test Company',
           type: COMPANY_TYPES.PYME,
           unexpectedField: 'should be rejected',
           anotherBadField: 123,
@@ -329,7 +329,7 @@ describe('CompanyController Negative Paths (e2e)', () => {
         .post('/v1/companies')
         .send({
           cuit: '30-44444444-4',
-          businessName: longName,
+          name: longName,
           type: COMPANY_TYPES.CORPORATE,
         })
         .expect((res) => {
@@ -346,7 +346,7 @@ describe('CompanyController Negative Paths (e2e)', () => {
         .post('/v1/companies')
         .send({
           cuit: uniqueCuit,
-          businessName: 'Test & Co. "Normal" Company',
+          name: 'Test & Co. "Normal" Company',
           type: COMPANY_TYPES.PYME,
         })
         .expect((res) => {
@@ -355,7 +355,7 @@ describe('CompanyController Negative Paths (e2e)', () => {
           expect([201, 400, 409, 500]).toContain(res.status);
           if (res.status === 201) {
             // If accepted, should contain the business name
-            expect(res.body.businessName).toBeDefined();
+            expect(res.body.name).toBeDefined();
           }
         });
     });

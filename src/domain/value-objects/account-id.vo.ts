@@ -32,6 +32,9 @@ export class AccountId {
   }
 
   equals(other: AccountId): boolean {
+    if (!other || !(other instanceof AccountId)) {
+      return false;
+    }
     return this.value === other.value;
   }
 

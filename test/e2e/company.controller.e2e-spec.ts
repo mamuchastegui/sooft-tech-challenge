@@ -48,7 +48,7 @@ describe('CompanyController (e2e)', () => {
     it('should create a new company successfully', () => {
       const createCompanyDto = {
         cuit: generateUniqueCuit(),
-        businessName: 'New Test Company SA',
+        name: 'New Test Company SA',
         type: COMPANY_TYPES.CORPORATE,
       };
 
@@ -58,7 +58,7 @@ describe('CompanyController (e2e)', () => {
         .expect(201)
         .expect((res) => {
           expect(res.body.cuit).toBe(createCompanyDto.cuit);
-          expect(res.body.businessName).toBe(createCompanyDto.businessName);
+          expect(res.body.name).toBe(createCompanyDto.name);
           expect(res.body.type).toBe(createCompanyDto.type);
           expect(res.body.id).toBeDefined();
           expect(res.body.joinedAt).toBeDefined();
@@ -69,7 +69,7 @@ describe('CompanyController (e2e)', () => {
       const uniqueCuit = generateUniqueCuit();
       const createCompanyDto = {
         cuit: uniqueCuit,
-        businessName: 'First Company',
+        name: 'First Company',
         type: COMPANY_TYPES.PYME,
       };
 
@@ -82,7 +82,7 @@ describe('CompanyController (e2e)', () => {
       // Try to create duplicate
       const duplicateDto = {
         cuit: uniqueCuit, // Same CUIT
-        businessName: 'Duplicate Company',
+        name: 'Duplicate Company',
         type: COMPANY_TYPES.CORPORATE,
       };
 
@@ -98,7 +98,7 @@ describe('CompanyController (e2e)', () => {
     it('should return 400 for invalid CUIT format', () => {
       const createCompanyDto = {
         cuit: '123456789',
-        businessName: 'Test Company',
+        name: 'Test Company',
         type: COMPANY_TYPES.CORPORATE,
       };
 
@@ -117,7 +117,7 @@ describe('CompanyController (e2e)', () => {
     it('should return 400 for invalid company type', () => {
       const createCompanyDto = {
         cuit: '30-12345678-1',
-        businessName: 'Test Company',
+        name: 'Test Company',
         type: 'INVALID_TYPE',
       };
 
@@ -152,7 +152,7 @@ describe('CompanyController (e2e)', () => {
           res.body.forEach((company: any) => {
             expect(company.id).toBeDefined();
             expect(company.cuit).toBeDefined();
-            expect(company.businessName).toBeDefined();
+            expect(company.name).toBeDefined();
             expect(company.joinedAt).toBeDefined();
             expect(company.type).toBeDefined();
           });

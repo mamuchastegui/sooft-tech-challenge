@@ -141,6 +141,15 @@ describe('Money Value Object', () => {
         const money2 = Money.create(100.0);
 
         expect(() => money1.subtract(money2)).toThrow(DomainError);
+        expect(() => money1.subtract(money2)).toThrow(/cannot be negative/);
+      });
+
+      it('should throw DomainError for near-negative result due to precision', () => {
+        const money1 = Money.create(100.01);
+        const money2 = Money.create(100.02);
+
+        // This should result in a negative value after rounding
+        expect(() => money1.subtract(money2)).toThrow(DomainError);
       });
 
       it('should handle exact subtraction to zero', () => {
@@ -249,6 +258,21 @@ describe('Money Value Object', () => {
         const money2 = Money.create(100.51);
 
         expect(money1.equals(money2)).toBe(false);
+      });
+
+      it('should return false when comparing with null or undefined', () => {
+        const money = Money.create(100.5);
+
+        expect(money.equals(null as any)).toBe(false);
+        expect(money.equals(undefined as any)).toBe(false);
+      });
+
+      it('should return false when comparing with non-Money object', () => {
+        const money = Money.create(100.5);
+
+        expect(money.equals(100.5 as any)).toBe(false);
+        expect(money.equals('100.50' as any)).toBe(false);
+        expect(money.equals({ amount: 100.5 } as any)).toBe(false);
       });
 
       it('should handle floating point precision correctly', () => {

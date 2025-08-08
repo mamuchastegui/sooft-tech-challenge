@@ -19,6 +19,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "test:negative": "jest --config ./test/jest-e2e.json test/e2e/company-negative-core.e2e-spec.ts",
+    "test:all": "npm run test && npm run test:e2e && npm run test:negative",
     "db:seed": "ts-node scripts/seed.ts",
     "db:migrate": "ts-node scripts/migrate.ts",
     "db:refresh-mv": "ts-node scripts/refresh-mv.ts"

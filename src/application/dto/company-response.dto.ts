@@ -25,7 +25,7 @@ export class CompanyResponseDto {
     description: 'Nombre de la empresa',
     example: 'Tech Solutions SA',
   })
-  businessName: string;
+  name: string;
 
   @ApiProperty({
     description: 'Fecha de adhesión de la empresa',
@@ -45,13 +45,13 @@ export class CompanyResponseDto {
   constructor(
     id: string,
     cuit: string,
-    businessName: string,
+    name: string,
     joinedAt: Date,
     type: CompanyType,
   ) {
     this.id = id;
     this.cuit = cuit;
-    this.businessName = businessName;
+    this.name = name;
     this.joinedAt = joinedAt;
     this.type = type;
   }

@@ -60,7 +60,7 @@ export class Money {
     const result = this.amount - other.amount;
     if (result < 0) {
       throw new DomainError(
-        'Money subtraction cannot result in negative amount',
+        'Money amount cannot be negative',
       );
     }
     return new Money(result);
@@ -92,6 +92,9 @@ export class Money {
   }
 
   equals(other: Money): boolean {
+    if (!other || !(other instanceof Money)) {
+      return false;
+    }
     return Math.abs(this.amount - other.amount) < 0.001; // Handle floating point precision
   }
 

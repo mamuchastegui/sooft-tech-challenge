@@ -54,7 +54,7 @@ describe('CompanyController Core Negative Paths (e2e)', () => {
         .post('/v1/companies')
         .send({
           cuit: uniqueCuit,
-          businessName: 'ACME',
+          name: 'ACME',
           type: COMPANY_TYPES.PYME,
         })
         .expect(201);
@@ -64,7 +64,7 @@ describe('CompanyController Core Negative Paths (e2e)', () => {
         .post('/v1/companies')
         .send({
           cuit: uniqueCuit,
-          businessName: 'ACME 2',
+          name: 'ACME 2',
           type: COMPANY_TYPES.CORPORATE,
         })
         .expect(409);
@@ -91,7 +91,7 @@ describe('CompanyController Core Negative Paths (e2e)', () => {
         .post('/v1/companies')
         .send({
           cuit: '12345',
-          businessName: 'Test Company',
+          name: 'Test Company',
           type: COMPANY_TYPES.PYME,
         })
         .expect(400);
@@ -102,7 +102,7 @@ describe('CompanyController Core Negative Paths (e2e)', () => {
         .post('/v1/companies')
         .send({
           cuit: '30-11111111-1',
-          businessName: 'Test Company',
+          name: 'Test Company',
           type: 'INVALID_TYPE',
         })
         .expect(400);

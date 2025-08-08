@@ -39,7 +39,7 @@ describe('CompanyService', () => {
   describe('createCompany', () => {
     const createCompanyDto: CreateCompanyDto = {
       cuit: '20-12345678-6',
-      businessName: 'Test Company SA',
+      name: 'Test Company SA',
       type: COMPANY_TYPES.CORPORATE,
     };
 
@@ -48,7 +48,7 @@ describe('CompanyService', () => {
 
       const savedCompany = CompanyFactory.createCorporate(
         createCompanyDto.cuit,
-        createCompanyDto.businessName,
+        createCompanyDto.name,
       );
 
       // Set the ID for testing
@@ -66,7 +66,7 @@ describe('CompanyService', () => {
       );
       expect(mockRepository.save).toHaveBeenCalled();
       expect(result.cuit).toBe(createCompanyDto.cuit);
-      expect(result.businessName).toBe(createCompanyDto.businessName);
+      expect(result.name).toBe(createCompanyDto.name);
       expect(result.type).toBe(createCompanyDto.type);
     });
 
@@ -107,7 +107,7 @@ describe('CompanyService', () => {
 
       expect(mockRepository.findById).toHaveBeenCalledWith('1');
       expect(result.id).toBe('1');
-      expect(result.businessName).toBe('Test Company');
+      expect(result.name).toBe('Test Company');
     });
 
     it('should throw NotFoundException when company not found', async () => {

@@ -59,6 +59,9 @@ export class Cuit {
   }
 
   equals(other: Cuit): boolean {
+    if (!other || !(other instanceof Cuit)) {
+      return false;
+    }
     return this.value === other.value;
   }
 

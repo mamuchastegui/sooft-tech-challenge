@@ -72,6 +72,22 @@ describe('Cuit Value Object', () => {
         expect(() => Cuit.create(invalidCuit)).toThrow(DomainError);
       });
     });
+
+    it('should throw DomainError for invalid DV (verification digit)', () => {
+      // Test specific cases where DV calculation fails
+      const invalidDVCases = [
+        '20-12345678-5', // Should be 6
+        '27-12345678-5', // Should be 0  
+        '30-50123456-7', // Should be 3
+        '33-55555555-4', // Should be 8
+        '34-99999999-1', // Should be 6
+      ];
+
+      invalidDVCases.forEach((invalidCuit) => {
+        expect(() => Cuit.create(invalidCuit)).toThrow(DomainError);
+        expect(() => Cuit.create(invalidCuit)).toThrow(/Invalid CUIT checksum/);
+      });
+    });
   });
 
   describe('equals', () => {
@@ -87,6 +103,21 @@ describe('Cuit Value Object', () => {
       const cuit2 = Cuit.create('20-11111111-2');
 
       expect(cuit1.equals(cuit2)).toBe(false);
+    });
+
+    it('should return false when comparing with null or undefined', () => {
+      const cuit = Cuit.create('30-12345678-1');
+
+      expect(cuit.equals(null as any)).toBe(false);
+      expect(cuit.equals(undefined as any)).toBe(false);
+    });
+
+    it('should return false when comparing with non-CUIT object', () => {
+      const cuit = Cuit.create('30-12345678-1');
+
+      expect(cuit.equals('30-12345678-1' as any)).toBe(false);
+      expect(cuit.equals({ raw: '30-12345678-1' } as any)).toBe(false);
+      expect(cuit.equals(123 as any)).toBe(false);
     });
 
     it('should handle whitespace normalization in comparison', () => {
