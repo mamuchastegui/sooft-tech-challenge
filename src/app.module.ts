@@ -15,7 +15,7 @@ import { DateProvider } from './infrastructure/providers/date.provider';
 import { COMPANY_REPOSITORY_TOKEN } from './domain/repositories/company.repository.token';
 import { TRANSFER_REPOSITORY_TOKEN } from './domain/repositories/transfer.repository.token';
 import { LoggingModule } from './infrastructure/logging/logging.module';
-import { TracingModule } from './infrastructure/tracing/tracing.module';
+// import { TracingModule } from './infrastructure/tracing/tracing.module';
 import { MetricsModule } from './infrastructure/metrics/metrics.module';
 import { HealthModule } from './infrastructure/health/health.module';
 import { RequestIdMiddleware } from './presentation/middleware/request-id.middleware';
@@ -27,7 +27,7 @@ import { RequestIdMiddleware } from './presentation/middleware/request-id.middle
     }),
     DatabaseModule,
     LoggingModule,
-    TracingModule.forRoot(),
+    // TracingModule.forRoot(),
     MetricsModule,
     HealthModule,
   ],
