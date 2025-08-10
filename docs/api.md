@@ -25,7 +25,7 @@ curl -X POST http://localhost:3000/v1/companies \
   -H "Content-Type: application/json" \
   -d '{
     "cuit": "30-12345678-1",
-    "businessName": "Tech Solutions SA",
+    "name": "Tech Solutions SA",
     "type": "CORPORATE"
   }'
 ```
@@ -35,7 +35,7 @@ curl -X POST http://localhost:3000/v1/companies \
 {
   "id": "uuid",
   "cuit": "30-12345678-1",
-  "businessName": "Tech Solutions SA",
+  "name": "Tech Solutions SA",
   "type": "CORPORATE",
   "joinedAt": "2023-12-01T10:00:00.000Z"
 }
@@ -72,7 +72,7 @@ curl -X GET "http://localhost:3000/v1/reports/companies/transfer-last-month"
   {
     "id": "uuid",
     "cuit": "30-12345678-1",
-    "businessName": "Tech Solutions SA",
+    "name": "Tech Solutions SA",
     "joinedAt": "2023-12-01T10:00:00.000Z",
     "type": "CORPORATE",
     "transferCount": 5,
@@ -92,7 +92,7 @@ curl -X GET "http://localhost:3000/v1/reports/companies/joined-last-month"
   {
     "id": "uuid",
     "cuit": "30-12345678-1",
-    "businessName": "Tech Solutions SA",
+    "name": "Tech Solutions SA",
     "joinedAt": "2023-12-01T10:00:00.000Z",
     "type": "CORPORATE"
   }
@@ -105,7 +105,7 @@ curl -X GET "http://localhost:3000/v1/reports/companies/joined-last-month"
   {
     "id": "uuid",
     "cuit": "30-12345678-1",
-    "businessName": "Tech Solutions SA",
+    "name": "Tech Solutions SA",
     "type": "CORPORATE",
     "joinedAt": "2023-12-01T10:00:00.000Z"
   }
@@ -164,7 +164,7 @@ La aplicación proporciona respuestas de error consistentes:
   "statusCode": 400,
   "message": [
     "cuit should not be empty",
-    "businessName should not be empty",
+    "name should not be empty",
     "type must be either PYME or CORPORATE"
   ],
   "error": "Bad Request"

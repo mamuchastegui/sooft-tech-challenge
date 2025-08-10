@@ -1,0 +1,68 @@
+logging {
+	level  = "debug"
+	format = "logfmt"
+}
+
+otelcol.receiver.otlp "default" {
+	// Recibe OTLP de la app
+	http {
+		endpoint = "0.0.0.0:4318"
+	}
+
+	grpc {
+		endpoint = "0.0.0.0:4317"
+	}
+
+	output {
+		traces = [
+			otelcol.processor.resourcedetection.default.input,
+			otelcol.processor.spanmetrics.default.input,
+		]
+	}
+}
+
+otelcol.processor.resourcedetection "default" {
+	detectors = ["env", "system"]
+
+	system {
+		hostname_sources = ["os"]
+	}
+
+	output {
+		traces = [otelcol.processor.batch.default.input]
+	}
+}
+
+otelcol.processor.batch "default" {
+	output {
+		traces = [otelcol.exporter.otlphttp.tempo.input]
+	}
+}
+
+otelcol.processor.spanmetrics "default" {
+	metrics_exporter = otelcol.exporter.prometheusremotewrite.prom.input
+
+	dimensions = ["service.name", "http.method", "http.route", "http.status_code"]
+
+	latency_histogram {
+		buckets = ["10ms", "25ms", "50ms", "100ms", "250ms", "500ms", "1s", "2.5s", "5s"]
+	}
+}
+
+otelcol.auth.basic "grafana_cloud" {
+	username = env("GRAFANA_CLOUD_INSTANCE_ID")
+	password = env("GRAFANA_CLOUD_API_KEY")
+}
+
+otelcol.exporter.otlphttp "tempo" {
+	client {
+		endpoint = env("GRAFANA_CLOUD_OTLP_ENDPOINT")
+		auth     = otelcol.auth.basic.grafana_cloud.handler
+	}
+}
+
+otelcol.exporter.prometheusremotewrite "prom" {
+	endpoint        = env("GRAFANA_CLOUD_PROM_RW_ENDPOINT")
+	auth            = otelcol.auth.basic.grafana_cloud.handler
+	external_labels = {env = "production", service_stack = "company-service"}
+}

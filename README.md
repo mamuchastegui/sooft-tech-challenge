@@ -96,6 +96,7 @@ npm run test:e2e
 | **🏢 Modelo de Dominio** | Polimorfismo de empresas PYME/Corporate, Factory y Strategy patterns | [docs/domain.md](docs/domain.md) |
 | **🔌 API** | Endpoints, ejemplos de uso, validación y manejo de errores | [docs/api.md](docs/api.md) |
 | **💾 Modelo de Datos** | Rendimiento, índices, vistas materializadas y escalabilidad | [docs/data-model.md](docs/data-model.md) |
+| **📊 Observabilidad** | Tracing, métricas, logging y monitoreo con OpenTelemetry | [docs/observability.md](docs/observability.md) |
 | **⚙️ Operaciones** | Despliegue, configuración, monitoreo y variables de entorno | [docs/ops.md](docs/ops.md) |
 | **🧪 Testing** | Estrategias de prueba, cobertura y CI/CD | [docs/testing.md](docs/testing.md) |
 | **☁️ AWS Lambda** | Implementación serverless, integración y despliegue | [docs/aws-lambda.md](docs/aws-lambda.md) |
@@ -155,18 +156,33 @@ PORT=3000
 
 **Documentación Swagger**: http://localhost:3000/api (cuando la app esté ejecutándose)
 
-## Observabilidad
+## 📊 Observabilidad
 
-La aplicación incluye observabilidad completa con structured logging, métricas y tracing:
+La aplicación incluye observabilidad completa con structured logging, métricas y distributed tracing:
 
-- **Structured Logging** (Pino): Logs JSON con request IDs y contexto enriquecido
-- **Health Checks**: `/health`, `/health/ready`, `/health/live` para liveness/readiness probes  
-- **Metrics** (Prometheus): `/metrics` endpoint con métricas de negocio y sistema
-- **Distributed Tracing** (OpenTelemetry): Configurable via `OTEL_EXPORTER_OTLP_ENDPOINT`
-
-Variables de entorno de observabilidad:
 ```bash
-LOG_LEVEL=info
-OTEL_SERVICE_NAME=sooft-tech-backend
-OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318  # opcional
+# Iniciar con tracing habilitado (via Grafana Agent)
+npm run start:otel
 ```
+
+**Características:**
+- **Structured Logging** (Pino): Logs JSON con request IDs y contexto enriquecido
+- **Health Checks**: `/health` endpoint para monitoring
+- **Metrics** (Prometheus): `/metrics` endpoint con métricas de sistema
+- **Distributed Tracing** (OpenTelemetry): Auto-instrumentación vía Grafana Agent
+
+**Quick Start con Tracing:**
+```bash
+# 1. Iniciar Grafana Agent
+docker run -d --name=grafana-agent -p 4318:4318 \
+  -v $(pwd)/ops/agent.yaml:/etc/agent/agent.yaml \
+  grafana/agent:latest --config.file=/etc/agent/agent.yaml
+
+# 2. Iniciar aplicación con tracing
+npm run start:otel
+
+# 3. Generar trazas
+curl http://localhost:3000/v1/companies
+```
+
+Ver [documentación completa de observabilidad](docs/observability.md) para configuración avanzada.
