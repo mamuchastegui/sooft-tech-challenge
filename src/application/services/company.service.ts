@@ -5,7 +5,6 @@ import {
   ConflictException,
   NotFoundException,
   Inject,
-  BadRequestException,
 } from '@nestjs/common';
 import { CompanyRepository } from '../../domain/repositories/company.repository.interface';
 import { CompanyFactory } from '../../domain/factories/company.factory';

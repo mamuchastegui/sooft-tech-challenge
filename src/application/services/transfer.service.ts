@@ -13,7 +13,12 @@ import { CompanyRepository } from '../../domain/repositories/company.repository.
 import { TRANSFER_REPOSITORY_TOKEN } from '../../domain/repositories/transfer.repository.token';
 import { COMPANY_REPOSITORY_TOKEN } from '../../domain/repositories/company.repository.token';
 import { Money } from '../../domain/value-objects/money';
-import { AccountId } from '../../domain/value-objects/account-id';
+import {
+  Account,
+  createCbuAccount,
+  createCvuAccount,
+  createAliasAccount,
+} from '../../domain/value-objects/account';
 import { Transfer } from '../../domain/entities/transfer.entity';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -41,8 +46,14 @@ export class TransferService {
 
     // Create Value Objects with validation
     const amount = Money.create(createTransferDto.amount);
-    const debitAccount = AccountId.create(createTransferDto.debitAccount);
-    const creditAccount = AccountId.create(createTransferDto.creditAccount);
+    const debitAccount = this.createAccountFromDto(
+      createTransferDto.debitAccountType,
+      createTransferDto.debitAccountValue,
+    );
+    const creditAccount = this.createAccountFromDto(
+      createTransferDto.creditAccountType,
+      createTransferDto.creditAccountValue,
+    );
 
     // Validate transfer limits using the company's policies
     const maxTransferAmount = Money.create(company.getMaxTransferAmount());
@@ -71,8 +82,10 @@ export class TransferService {
       plainObject.id,
       plainObject.amount,
       plainObject.companyId,
-      plainObject.debitAccount,
-      plainObject.creditAccount,
+      plainObject.debitAccountType,
+      plainObject.debitAccountValue,
+      plainObject.creditAccountType,
+      plainObject.creditAccountValue,
       plainObject.createdAt,
     );
   }
@@ -88,8 +101,10 @@ export class TransferService {
         plainObject.id,
         plainObject.amount,
         plainObject.companyId,
-        plainObject.debitAccount,
-        plainObject.creditAccount,
+        plainObject.debitAccountType,
+        plainObject.debitAccountValue,
+        plainObject.creditAccountType,
+        plainObject.creditAccountValue,
         plainObject.createdAt,
       );
     });
@@ -107,9 +122,27 @@ export class TransferService {
       plainObject.id,
       plainObject.amount,
       plainObject.companyId,
-      plainObject.debitAccount,
-      plainObject.creditAccount,
+      plainObject.debitAccountType,
+      plainObject.debitAccountValue,
+      plainObject.creditAccountType,
+      plainObject.creditAccountValue,
       plainObject.createdAt,
     );
+  }
+
+  private createAccountFromDto(
+    accountType: 'CBU' | 'CVU' | 'ALIAS',
+    accountValue: string,
+  ): Account {
+    switch (accountType) {
+      case 'CBU':
+        return createCbuAccount(accountValue);
+      case 'CVU':
+        return createCvuAccount(accountValue);
+      case 'ALIAS':
+        return createAliasAccount(accountValue);
+      default:
+        throw new BadRequestException(`Invalid account type: ${accountType}`);
+    }
   }
 }

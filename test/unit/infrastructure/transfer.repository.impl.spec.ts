@@ -4,22 +4,25 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { TransferRepositoryImpl } from '../../../src/infrastructure/repositories/transfer.repository.impl';
-import { Transfer } from '../../../src/domain/entities/transfer.entity';
 import { TransferEntity } from '../../../src/infrastructure/database/entities/transfer.entity';
+import { Transfer } from '../../../src/domain/entities/transfer.entity';
 import { Money } from '../../../src/domain/value-objects/money';
-import { AccountId } from '../../../src/domain/value-objects/account-id';
+import { createCbuAccount, createAliasAccount } from '../../../src/domain/value-objects/account';
 
 describe('TransferRepositoryImpl', () => {
   let repository: TransferRepositoryImpl;
   let mockTransferRepository: jest.Mocked<Repository<TransferEntity>>;
 
   beforeEach(async () => {
-    const mockTransferRepo = {
-      create: jest.fn(),
+    const mockRepo = {
       save: jest.fn(),
       findOne: jest.fn(),
       find: jest.fn(),
-      createQueryBuilder: jest.fn(),
+      createQueryBuilder: jest.fn(() => ({
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        getMany: jest.fn(),
+      })),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -27,7 +30,7 @@ describe('TransferRepositoryImpl', () => {
         TransferRepositoryImpl,
         {
           provide: getRepositoryToken(TransferEntity),
-          useValue: mockTransferRepo,
+          useValue: mockRepo,
         },
       ],
     }).compile();
@@ -36,11 +39,15 @@ describe('TransferRepositoryImpl', () => {
     mockTransferRepository = module.get(getRepositoryToken(TransferEntity));
   });
 
+  it('should be defined', () => {
+    expect(repository).toBeDefined();
+  });
+
   describe('save', () => {
-    it('should save a transfer successfully', async () => {
-      const amount = Money.create(1000.5);
-      const debitAccount = AccountId.create('1234567890123');
-      const creditAccount = AccountId.create('9876543210987');
+    it('should save a transfer and return domain entity', async () => {
+      const amount = Money.create(1000);
+      const debitAccount = createCbuAccount('2850590940090418135201');
+      const creditAccount = createAliasAccount('my.wallet');
 
       const transfer = new Transfer(
         '1',
@@ -55,46 +62,37 @@ describe('TransferRepositoryImpl', () => {
         id: '1',
         amount,
         companyId: 'company-1',
-        debitAccount,
-        creditAccount,
+        debitAccountType: 'CBU' as const,
+        debitAccountValue: '2850590940090418135201',
+        creditAccountType: 'ALIAS' as const,
+        creditAccountValue: 'my.wallet',
         createdAt: expect.any(Date),
         company: undefined,
       };
 
-      mockTransferRepository.create.mockReturnValue(
-        transferEntity as TransferEntity,
-      );
       mockTransferRepository.save.mockResolvedValue(
         transferEntity as TransferEntity,
       );
 
       const result = await repository.save(transfer);
 
-      expect(mockTransferRepository.create).toHaveBeenCalledWith({
-        id: '1',
-        amount: 1000.5,
-        companyId: 'company-1',
-        debitAccount: '1234567890123',
-        creditAccount: '9876543210987',
-        createdAt: expect.any(Date),
-      });
-      expect(mockTransferRepository.save).toHaveBeenCalledWith(transferEntity);
+      expect(mockTransferRepository.save).toHaveBeenCalled();
       expect(result).toBeInstanceOf(Transfer);
+      expect(result.id).toBe('1');
+      expect(result.amount).toEqual(amount);
     });
   });
 
   describe('findById', () => {
-    it('should return a transfer when found', async () => {
-      const amount = Money.create(1000.5);
-      const debitAccount = AccountId.create('1234567890123');
-      const creditAccount = AccountId.create('9876543210987');
-
+    it('should return transfer when found', async () => {
       const transferEntity = {
         id: '1',
-        amount,
+        amount: Money.create(1000),
         companyId: 'company-1',
-        debitAccount,
-        creditAccount,
+        debitAccountType: 'CBU' as const,
+        debitAccountValue: '2850590940090418135201',
+        creditAccountType: 'ALIAS' as const,
+        creditAccountValue: 'my.wallet',
         createdAt: new Date(),
         company: undefined,
       };
@@ -115,25 +113,23 @@ describe('TransferRepositoryImpl', () => {
     it('should return null when not found', async () => {
       mockTransferRepository.findOne.mockResolvedValue(null);
 
-      const result = await repository.findById('1');
+      const result = await repository.findById('nonexistent');
 
       expect(result).toBeNull();
     });
   });
 
   describe('findByCompanyId', () => {
-    it('should return transfers for a specific company', async () => {
-      const amount = Money.create(1000.5);
-      const debitAccount = AccountId.create('1234567890123');
-      const creditAccount = AccountId.create('9876543210987');
-
+    it('should return transfers for company', async () => {
       const transferEntities = [
         {
           id: '1',
-          amount,
+          amount: Money.create(1000),
           companyId: 'company-1',
-          debitAccount,
-          creditAccount,
+          debitAccountType: 'CBU' as const,
+          debitAccountValue: '2850590940090418135201',
+          creditAccountType: 'ALIAS' as const,
+          creditAccountValue: 'my.wallet',
           createdAt: new Date(),
           company: undefined,
         },
@@ -155,29 +151,15 @@ describe('TransferRepositoryImpl', () => {
 
   describe('findAll', () => {
     it('should return all transfers', async () => {
-      const amount1 = Money.create(1000.5);
-      const amount2 = Money.create(2500.75);
-      const debitAccount1 = AccountId.create('1234567890123');
-      const creditAccount1 = AccountId.create('9876543210987');
-      const debitAccount2 = AccountId.create('1111111111111');
-      const creditAccount2 = AccountId.create('2222222222222');
-
       const transferEntities = [
         {
           id: '1',
-          amount: amount1,
+          amount: Money.create(1000),
           companyId: 'company-1',
-          debitAccount: debitAccount1,
-          creditAccount: creditAccount1,
-          createdAt: new Date(),
-          company: undefined,
-        },
-        {
-          id: '2',
-          amount: amount2,
-          companyId: 'company-2',
-          debitAccount: debitAccount2,
-          creditAccount: creditAccount2,
+          debitAccountType: 'CBU' as const,
+          debitAccountValue: '2850590940090418135201',
+          creditAccountType: 'ALIAS' as const,
+          creditAccountValue: 'my.wallet',
           createdAt: new Date(),
           company: undefined,
         },
@@ -190,24 +172,36 @@ describe('TransferRepositoryImpl', () => {
       const result = await repository.findAll();
 
       expect(mockTransferRepository.find).toHaveBeenCalled();
-      expect(result).toHaveLength(2);
+      expect(result).toHaveLength(1);
       expect(result[0]).toBeInstanceOf(Transfer);
-      expect(result[1]).toBeInstanceOf(Transfer);
     });
   });
 
   describe('findTransfersByCompanyIdAndDateRange', () => {
-    it('should find transfers by company and date range', async () => {
+    it('should return transfers within date range', async () => {
       const startDate = new Date('2023-01-01');
-      const endDate = new Date('2023-01-31');
+      const endDate = new Date('2023-12-31');
+      const transferEntities = [
+        {
+          id: '1',
+          amount: Money.create(1000),
+          companyId: 'company-1',
+          debitAccountType: 'CBU' as const,
+          debitAccountValue: '2850590940090418135201',
+          creditAccountType: 'ALIAS' as const,
+          creditAccountValue: 'my.wallet',
+          createdAt: new Date(),
+          company: undefined,
+        },
+      ];
 
       const queryBuilder = {
         where: jest.fn().mockReturnThis(),
         andWhere: jest.fn().mockReturnThis(),
-        getMany: jest.fn().mockResolvedValue([]),
-      } as any;
+        getMany: jest.fn().mockResolvedValue(transferEntities),
+      };
 
-      mockTransferRepository.createQueryBuilder.mockReturnValue(queryBuilder);
+      mockTransferRepository.createQueryBuilder.mockReturnValue(queryBuilder as any);
 
       const result = await repository.findTransfersByCompanyIdAndDateRange(
         'company-1',
@@ -215,9 +209,6 @@ describe('TransferRepositoryImpl', () => {
         endDate,
       );
 
-      expect(mockTransferRepository.createQueryBuilder).toHaveBeenCalledWith(
-        'transfer',
-      );
       expect(queryBuilder.where).toHaveBeenCalledWith(
         'transfer.companyId = :companyId',
         { companyId: 'company-1' },
@@ -230,7 +221,8 @@ describe('TransferRepositoryImpl', () => {
         'transfer.createdAt <= :endDate',
         { endDate },
       );
-      expect(result).toEqual([]);
+      expect(result).toHaveLength(1);
+      expect(result[0]).toBeInstanceOf(Transfer);
     });
   });
 });

@@ -38,26 +38,60 @@ export class CreateTransferDto {
   companyId: string;
 
   @ApiProperty({
-    description: 'Debit account number (exactly 13 digits)',
-    example: '1234567890123',
-    pattern: '^\\d{13}$',
+    description: 'Type of debit account',
+    example: 'CBU',
+    enum: ['CBU', 'CVU', 'ALIAS'],
   })
   @IsNotEmpty()
   @IsString()
-  @Matches(/^\d{13}$/, {
-    message: 'Debit account must be exactly 13 digits',
+  @Matches(/^(CBU|CVU|ALIAS)$/, {
+    message: 'Debit account type must be CBU, CVU, or ALIAS',
   })
-  debitAccount: string;
+  debitAccountType: 'CBU' | 'CVU' | 'ALIAS';
 
   @ApiProperty({
-    description: 'Credit account number (exactly 13 digits)',
-    example: '9876543210987',
-    pattern: '^\\d{13}$',
+    description:
+      'Debit account value - 22 digits for CBU/CVU, 6-20 chars for ALIAS',
+    example: '2850590940090418135201',
+    oneOf: [
+      { pattern: '^\\d{22}$', description: 'CBU: 22 digits' },
+      { pattern: '^\\d{22}$', description: 'CVU: 22 digits' },
+      {
+        pattern: '^[A-Za-z0-9._-]{6,20}$',
+        description: 'ALIAS: 6-20 alphanumeric chars with ._-',
+      },
+    ],
   })
   @IsNotEmpty()
   @IsString()
-  @Matches(/^\d{13}$/, {
-    message: 'Credit account must be exactly 13 digits',
+  debitAccountValue: string;
+
+  @ApiProperty({
+    description: 'Type of credit account',
+    example: 'CVU',
+    enum: ['CBU', 'CVU', 'ALIAS'],
   })
-  creditAccount: string;
+  @IsNotEmpty()
+  @IsString()
+  @Matches(/^(CBU|CVU|ALIAS)$/, {
+    message: 'Credit account type must be CBU, CVU, or ALIAS',
+  })
+  creditAccountType: 'CBU' | 'CVU' | 'ALIAS';
+
+  @ApiProperty({
+    description:
+      'Credit account value - 22 digits for CBU/CVU, 6-20 chars for ALIAS',
+    example: '0000003100010000000001',
+    oneOf: [
+      { pattern: '^\\d{22}$', description: 'CBU: 22 digits' },
+      { pattern: '^\\d{22}$', description: 'CVU: 22 digits' },
+      {
+        pattern: '^[A-Za-z0-9._-]{6,20}$',
+        description: 'ALIAS: 6-20 alphanumeric chars with ._-',
+      },
+    ],
+  })
+  @IsNotEmpty()
+  @IsString()
+  creditAccountValue: string;
 }

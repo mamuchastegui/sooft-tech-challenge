@@ -24,20 +24,30 @@ export class TransferResponseDto {
   companyId: string;
 
   @ApiProperty({
-    description: 'Debit account (13 digits)',
-    example: '1234567890123',
-    maxLength: 13,
-    minLength: 13,
+    description: 'Debit account type',
+    example: 'CBU',
+    enum: ['CBU', 'CVU', 'ALIAS'],
   })
-  debitAccount: string;
+  debitAccountType: 'CBU' | 'CVU' | 'ALIAS';
 
   @ApiProperty({
-    description: 'Credit account (13 digits)',
-    example: '9876543210987',
-    maxLength: 13,
-    minLength: 13,
+    description: 'Debit account value (masked for security)',
+    example: '285***************201',
   })
-  creditAccount: string;
+  debitAccountValue: string;
+
+  @ApiProperty({
+    description: 'Credit account type',
+    example: 'CVU',
+    enum: ['CBU', 'CVU', 'ALIAS'],
+  })
+  creditAccountType: 'CBU' | 'CVU' | 'ALIAS';
+
+  @ApiProperty({
+    description: 'Credit account value (masked for security)',
+    example: '000***************001',
+  })
+  creditAccountValue: string;
 
   @ApiProperty({
     description: 'Transfer creation timestamp',
@@ -51,15 +61,19 @@ export class TransferResponseDto {
     id: string,
     amount: number,
     companyId: string,
-    debitAccount: string,
-    creditAccount: string,
+    debitAccountType: 'CBU' | 'CVU' | 'ALIAS',
+    debitAccountValue: string,
+    creditAccountType: 'CBU' | 'CVU' | 'ALIAS',
+    creditAccountValue: string,
     createdAt: Date,
   ) {
     this.id = id;
     this.amount = amount;
     this.companyId = companyId;
-    this.debitAccount = debitAccount;
-    this.creditAccount = creditAccount;
+    this.debitAccountType = debitAccountType;
+    this.debitAccountValue = debitAccountValue;
+    this.creditAccountType = creditAccountType;
+    this.creditAccountValue = creditAccountValue;
     this.createdAt = createdAt;
   }
 }

@@ -28,10 +28,10 @@ describe('Company Negative E2E Tests', () => {
       try {
         await request(app.getHttpServer())
           .delete(`/v1/companies/${createdCompanyId}`)
-          .expect((res) => {
+          .expect(() => {
             // Allow 200 (deleted), 404 (not found), or other status
           });
-      } catch (e) {
+      } catch {
         // Ignore cleanup errors
       }
       createdCompanyId = null;

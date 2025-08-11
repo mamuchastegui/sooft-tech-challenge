@@ -8,7 +8,7 @@ import { Transfer } from '../../../src/domain/entities/transfer.entity';
 import { TRANSFER_REPOSITORY_TOKEN } from '../../../src/domain/repositories/transfer.repository.token';
 import { COMPANY_REPOSITORY_TOKEN } from '../../../src/domain/repositories/company.repository.token';
 import { Money } from '../../../src/domain/value-objects/money';
-import { AccountId } from '../../../src/domain/value-objects/account-id';
+import { createCbuAccount, createAliasAccount } from '../../../src/domain/value-objects/account';
 
 describe('TransferService', () => {
   let service: TransferService;
@@ -52,8 +52,8 @@ describe('TransferService', () => {
   describe('getTransfersByCompanyId', () => {
     it('should return transfers for specific company', async () => {
       const amount = Money.create(1000.5);
-      const debitAccount = AccountId.create('1234567890123');
-      const creditAccount = AccountId.create('9876543210987');
+      const debitAccount = createCbuAccount('2850590940090418135201');
+      const creditAccount = createAliasAccount('my.wallet');
 
       const transfers = [
         new Transfer(
@@ -81,8 +81,8 @@ describe('TransferService', () => {
   describe('getTransferById', () => {
     it('should return transfer when found', async () => {
       const amount = Money.create(1000.5);
-      const debitAccount = AccountId.create('1234567890123');
-      const creditAccount = AccountId.create('9876543210987');
+      const debitAccount = createCbuAccount('2850590940090418135201');
+      const creditAccount = createAliasAccount('my.wallet');
 
       const transfer = new Transfer(
         '1',

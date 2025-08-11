@@ -11,6 +11,8 @@ describe('Money Value Object', () => {
       expect(money).toBeInstanceOf(Money);
       expect(money.toNumber()).toBe(100.5);
       expect(money.toString()).toBe('100.50');
+      expect(money.getCurrency()).toBe('ARS');
+      expect(money.getCents()).toBe(10050n);
     });
 
     it('should create Money from valid string', () => {
@@ -39,6 +41,7 @@ describe('Money Value Object', () => {
 
       expect(money.toNumber()).toBe(0);
       expect(money.toString()).toBe('0.00');
+      expect(money.getCurrency()).toBe('ARS');
     });
 
     it('should round to 2 decimal places', () => {

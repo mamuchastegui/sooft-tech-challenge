@@ -81,8 +81,78 @@ export function maskCvu(cvu: string): string {
 }
 
 /**
- * Masks AccountId keeping first 3 and last 3 digits
+ * Masks Alias accounts keeping first and last characters
+ * Format: "my.wallet.123" → "my******123"
+ */
+export function maskAlias(alias: string): string {
+  if (typeof alias !== 'string') {
+    return String(alias);
+  }
+
+  // Alias accounts are 6-20 alphanumeric characters with ._-
+  if (
+    alias.length >= 6 &&
+    alias.length <= 20 &&
+    /^[A-Za-z0-9._-]+$/.test(alias)
+  ) {
+    if (alias.length <= 4) {
+      return alias; // Too short to mask meaningfully
+    }
+    const visibleChars = Math.max(2, Math.floor(alias.length / 4));
+    const startVisible = alias.substring(0, visibleChars);
+    const endVisible = alias.substring(alias.length - visibleChars);
+    const maskLength = alias.length - 2 * visibleChars;
+    return startVisible + '*'.repeat(maskLength) + endVisible;
+  }
+
+  // Conservative fallback for strings that might be aliases
+  if (alias.length > 4) {
+    return alias.slice(0, 2) + '*'.repeat(alias.length - 4) + alias.slice(-2);
+  }
+
+  return alias;
+}
+
+/**
+ * Generic account value masker that handles CBU, CVU, and Alias
+ * Based on the account type and value format
+ */
+export function maskAccountValue(
+  accountType: string,
+  accountValue: string,
+): string {
+  if (typeof accountValue !== 'string') {
+    return String(accountValue);
+  }
+
+  switch (accountType?.toUpperCase()) {
+    case 'CBU':
+      return maskCbu(accountValue);
+    case 'CVU':
+      return maskCvu(accountValue);
+    case 'ALIAS':
+      return maskAlias(accountValue);
+    default:
+      // Fallback: try to detect format
+      if (accountValue.length === 22 && /^\d+$/.test(accountValue)) {
+        return maskCbu(accountValue); // Assume CBU/CVU
+      } else if (/^[A-Za-z0-9._-]{6,20}$/.test(accountValue)) {
+        return maskAlias(accountValue); // Assume Alias
+      } else {
+        // Generic masking for unknown formats
+        return accountValue.length > 4
+          ? accountValue.slice(0, 2) +
+              '*'.repeat(accountValue.length - 4) +
+              accountValue.slice(-2)
+          : accountValue;
+      }
+  }
+}
+
+/**
+ * Masks AccountId keeping first 3 and last 3 digits (legacy)
  * Format: "1234567890123" → "123*******123"
+ * @deprecated Use maskAccountValue with proper account type instead
  */
 export function maskAccountId(accountId: string): string {
   if (typeof accountId !== 'string') {
@@ -156,6 +226,10 @@ const SENSITIVE_KEYS = new Set([
   'cvu',
   'accountid',
   'account_id',
+  'debitaccountvalue',
+  'debit_account_value',
+  'creditaccountvalue',
+  'credit_account_value',
 
   // Personal data
   'email',
@@ -198,6 +272,28 @@ export function redactObject<T>(obj: T): T {
       } else if (lowerKey === 'accountid' || lowerKey === 'account_id') {
         cloned[key] =
           typeof value === 'string' ? maskAccountId(value) : '***REDACTED***';
+      } else if (
+        lowerKey === 'debitaccountvalue' ||
+        lowerKey === 'debit_account_value'
+      ) {
+        // Try to find corresponding account type for better masking
+        const accountType =
+          cloned['debitAccountType'] || cloned['debit_account_type'] || '';
+        cloned[key] =
+          typeof value === 'string'
+            ? maskAccountValue(accountType, value)
+            : '***REDACTED***';
+      } else if (
+        lowerKey === 'creditaccountvalue' ||
+        lowerKey === 'credit_account_value'
+      ) {
+        // Try to find corresponding account type for better masking
+        const accountType =
+          cloned['creditAccountType'] || cloned['credit_account_type'] || '';
+        cloned[key] =
+          typeof value === 'string'
+            ? maskAccountValue(accountType, value)
+            : '***REDACTED***';
       } else if (lowerKey === 'email') {
         cloned[key] =
           typeof value === 'string' ? maskEmail(value) : '***REDACTED***';
@@ -261,6 +357,10 @@ export const PINO_REDACT_PATHS = [
   'req.body.cvu',
   'req.body.accountId',
   'req.body.account_id',
+  'req.body.debitAccountValue',
+  'req.body.debit_account_value',
+  'req.body.creditAccountValue',
+  'req.body.credit_account_value',
   'req.body.email',
 
   // Query parameters

@@ -10,9 +10,7 @@ import {
 } from 'typeorm';
 import { CompanyEntity } from './company.entity';
 import { Money } from '../../../domain/value-objects/money';
-import { AccountId } from '../../../domain/value-objects/account-id';
-import { MoneyTransformer } from '../transformers/money.transformer';
-import { AccountIdTransformer } from '../transformers/account-id.transformer';
+import { LegacyMoneyTransformer } from '../transformers/money.transformer';
 
 @Entity('transfers')
 export class TransferEntity {
@@ -22,7 +20,7 @@ export class TransferEntity {
   @Column('decimal', {
     precision: 12,
     scale: 2,
-    transformer: new MoneyTransformer(),
+    transformer: new LegacyMoneyTransformer(),
   })
   amount: Money;
 
@@ -30,18 +28,28 @@ export class TransferEntity {
   companyId: string;
 
   @Column('varchar', {
-    name: 'debit_account',
-    length: 13,
-    transformer: new AccountIdTransformer(),
+    name: 'debit_account_type',
+    length: 10,
   })
-  debitAccount: AccountId;
+  debitAccountType: 'CBU' | 'CVU' | 'ALIAS';
 
   @Column('varchar', {
-    name: 'credit_account',
-    length: 13,
-    transformer: new AccountIdTransformer(),
+    name: 'debit_account_value',
+    length: 22,
   })
-  creditAccount: AccountId;
+  debitAccountValue: string;
+
+  @Column('varchar', {
+    name: 'credit_account_type',
+    length: 10,
+  })
+  creditAccountType: 'CBU' | 'CVU' | 'ALIAS';
+
+  @Column('varchar', {
+    name: 'credit_account_value',
+    length: 22,
+  })
+  creditAccountValue: string;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

@@ -2,10 +2,7 @@
 
 import { Company } from '../../../src/domain/entities/company.entity';
 import { CompanyTypeValueObject } from '../../../src/domain/value-objects/company-type.value-object';
-import {
-  CompanyType,
-  COMPANY_TYPES,
-} from '../../../src/domain/value-objects/company-type.constants';
+import { COMPANY_TYPES } from '../../../src/domain/value-objects/company-type.constants';
 
 describe('Company Entity', () => {
   describe('constructor', () => {

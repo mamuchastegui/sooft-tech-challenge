@@ -1,15 +1,15 @@
 // src/domain/entities/transfer.entity.ts
 
 import { Money } from '../value-objects/money';
-import { AccountId } from '../value-objects/account-id';
+import { Account, accountToMaskedString } from '../value-objects/account';
 
 export class Transfer {
   constructor(
     public readonly id: string,
     public readonly amount: Money,
     public readonly companyId: string,
-    public readonly debitAccount: AccountId,
-    public readonly creditAccount: AccountId,
+    public readonly debitAccount: Account,
+    public readonly creditAccount: Account,
     public readonly createdAt: Date,
   ) {
     this.validateCompanyId(companyId);
@@ -26,8 +26,10 @@ export class Transfer {
       id: this.id,
       amount: this.amount.toNumber(),
       companyId: this.companyId,
-      debitAccount: this.debitAccount.toString(),
-      creditAccount: this.creditAccount.toString(),
+      debitAccountType: this.debitAccount.kind,
+      debitAccountValue: accountToMaskedString(this.debitAccount),
+      creditAccountType: this.creditAccount.kind,
+      creditAccountValue: accountToMaskedString(this.creditAccount),
       createdAt: this.createdAt,
     };
   }

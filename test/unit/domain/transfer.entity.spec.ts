@@ -2,7 +2,7 @@
 
 import { Transfer } from '../../../src/domain/entities/transfer.entity';
 import { Money } from '../../../src/domain/value-objects/money';
-import { AccountId } from '../../../src/domain/value-objects/account-id';
+import { createCbuAccount, createAliasAccount } from '../../../src/domain/value-objects/account';
 import { DomainError } from '../../../src/domain/errors/domain.error';
 
 describe('Transfer Entity', () => {
@@ -10,8 +10,8 @@ describe('Transfer Entity', () => {
     it('should create a valid transfer', () => {
       const createdAt = new Date();
       const amount = Money.create(1000.5);
-      const debitAccount = AccountId.create('1234567890123');
-      const creditAccount = AccountId.create('9876543210987');
+      const debitAccount = createCbuAccount('2850590940090418135201');
+      const creditAccount = createAliasAccount('my.wallet');
 
       const transfer = new Transfer(
         '1',
@@ -50,20 +50,20 @@ describe('Transfer Entity', () => {
 
     it('should throw error for invalid debit account format', () => {
       expect(() => {
-        AccountId.create('123456');
+        createCbuAccount('123456');
       }).toThrow(DomainError);
     });
 
     it('should throw error for invalid credit account format', () => {
       expect(() => {
-        AccountId.create('654321');
+        createAliasAccount('ab');
       }).toThrow(DomainError);
     });
 
     it('should throw error for empty company ID', () => {
       const amount = Money.create(1000);
-      const debitAccount = AccountId.create('1234567890123');
-      const creditAccount = AccountId.create('9876543210987');
+      const debitAccount = createCbuAccount('2850590940090418135201');
+      const creditAccount = createAliasAccount('my.wallet');
 
       expect(() => {
         new Transfer('1', amount, '', debitAccount, creditAccount, new Date());
@@ -75,8 +75,8 @@ describe('Transfer Entity', () => {
     it('should return plain object representation', () => {
       const createdAt = new Date();
       const amount = Money.create(1000.5);
-      const debitAccount = AccountId.create('1234567890123');
-      const creditAccount = AccountId.create('9876543210987');
+      const debitAccount = createCbuAccount('2850590940090418135201');
+      const creditAccount = createAliasAccount('my.wallet');
 
       const transfer = new Transfer(
         '1',

@@ -12,17 +12,27 @@ export class Cuit {
       throw new DomainError('CUIT must be a non-empty string');
     }
 
-    const normalized = raw.trim();
-
-    if (!this.isValidFormat(normalized)) {
-      throw new DomainError('CUIT must follow the format XX-XXXXXXXX-X');
-    }
+    const normalized = this.normalize(raw);
 
     if (!this.isValidChecksum(normalized)) {
       throw new DomainError('Invalid CUIT checksum');
     }
 
     return new Cuit(normalized);
+  }
+
+  static normalize(raw: string): string {
+    const trimmed = raw.trim();
+
+    // Remove all non-digits
+    const digitsOnly = trimmed.replace(/\D/g, '');
+
+    if (digitsOnly.length !== 11) {
+      throw new DomainError('CUIT must have exactly 11 digits');
+    }
+
+    // Format as XX-XXXXXXXX-X
+    return `${digitsOnly.slice(0, 2)}-${digitsOnly.slice(2, 10)}-${digitsOnly.slice(10)}`;
   }
 
   private static isValidFormat(cuit: string): boolean {
@@ -56,6 +66,19 @@ export class Cuit {
 
   toString(): string {
     return this.value;
+  }
+
+  toMasked(): string {
+    // Format: 20-XXXXXXXX-3 -> 20-****XXXX-3
+    const parts = this.value.split('-');
+    const middlePart = parts[1];
+    const maskedMiddle = '****' + middlePart.slice(-4);
+    return `${parts[0]}-${maskedMiddle}-${parts[2]}`;
+  }
+
+  toNormalized(): string {
+    // Return digits only (11 chars) for database storage
+    return this.value.replace(/-/g, '');
   }
 
   equals(other: Cuit): boolean {

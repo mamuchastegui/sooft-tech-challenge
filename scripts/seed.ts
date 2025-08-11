@@ -86,8 +86,10 @@ async function seed() {
             max: c.type === 'PYME' ? 100_000 : 1_000_000,
             dec: 2
           }))),
-          debitAccount: AccountId.create(generateValidAccountId()),
-          creditAccount: AccountId.create(generateValidAccountId()),
+          debitAccountType: 'CBU',
+          debitAccountValue: '2850590940090418135201',
+          creditAccountType: 'ALIAS',
+          creditAccountValue: 'my.wallet',
         });
         transfers.push(transfer);
       }
