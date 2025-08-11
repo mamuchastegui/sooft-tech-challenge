@@ -3,6 +3,7 @@
 import { LoggerService } from '@nestjs/common';
 import { Params } from 'nestjs-pino';
 import { getOtelTraceInfo } from './otel-context.util';
+import { PINO_REDACT_PATHS, redactHeaders } from './redact.util';
 
 /**
  * Factory for creating Pino logger configuration with OpenTelemetry integration
@@ -14,6 +15,12 @@ export function createPinoLoggerConfig(): Params {
   return {
     pinoHttp: {
       level: logLevel,
+
+      // Redact sensitive data from logs
+      redact: {
+        paths: PINO_REDACT_PATHS,
+        censor: '***REDACTED***',
+      },
 
       // Transport for pretty printing in development
       transport: !isProduction
@@ -48,14 +55,7 @@ export function createPinoLoggerConfig(): Params {
             query: req.query,
             params: req.params,
             ...otelInfo,
-            headers: {
-              'x-request-id': req.headers['x-request-id'],
-              'user-agent': req.headers['user-agent'],
-              'content-type': req.headers['content-type'],
-              authorization: req.headers.authorization
-                ? '[REDACTED]'
-                : undefined,
-            },
+            headers: redactHeaders(req.headers || {}),
           };
         },
 

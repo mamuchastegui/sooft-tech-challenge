@@ -456,3 +456,136 @@ Logs de debug incluyen:
 2. **Obtener Contexto**: Usar `requestId` para seguir flujo completo
 3. **Correlación**: Usar `trace_id` para ver timing y dependencies en Tempo
 4. **Root Cause**: Stack trace + cause information en logs structured
+
+## Ofuscación/Redacción de Datos
+
+### Campos Sensibles Protegidos
+
+El sistema de logging redacta automáticamente datos sensibles para prevenir exposición en logs:
+
+| Tipo de Campo | Entrada Ejemplo | Salida Enmascarada | Patrón |
+|---------------|-----------------|-------------------|--------|
+| CUIT | `30-12345678-1` | `30-****5678-1` | Mantiene prefijo y dígito verificador |
+| CBU | `2850590940090418135201` | `285***************201` | Mantiene primeros 3 y últimos 3 |
+| CVU | `0000003100010000000001` | `000***************001` | Igual que CBU |
+| AccountId | `1234567890123` | `123*******123` | Mantiene primeros 3 y últimos 3 |
+| Email | `john.doe@example.com` | `j*******@example.com` | Mantiene primer caracter y dominio |
+| Tokens/Secretos | `Bearer abc123...` | `***REDACTED***` | Redacción completa |
+
+### Detección Automática de Campos
+
+El sistema redacta automáticamente campos con estos nombres (insensible a mayúsculas):
+
+**Autenticación:** `authorization`, `password`, `token`, `access_token`, `refresh_token`, `secret`, `apiKey`, `api_key`, `x-api-key`, `cookie`
+
+**Financieros:** `cuit`, `cbu`, `cvu`, `accountId`, `account_id`
+
+**Personales:** `email`
+
+### Ejemplos de Logging de Requests
+
+#### Antes de la Redacción (Datos Raw)
+```json
+{
+  "msg": "Incoming POST request",
+  "method": "POST", 
+  "url": "/v1/companies",
+  "headers": {
+    "authorization": "Bearer eyJhbGciOiJIUzI1NiIs...",
+    "x-api-key": "ak_live_1234567890abcdef"
+  },
+  "body": {
+    "businessName": "ACME Corp",
+    "cuit": "30-12345678-1",
+    "email": "admin@acmecorp.com",
+    "cbu": "2850590940090418135201"
+  }
+}
+```
+
+#### Después de la Redacción (Logueado)
+```json
+{
+  "msg": "Incoming POST request",
+  "method": "POST",
+  "url": "/v1/companies", 
+  "headers": {
+    "authorization": "***REDACTED***",
+    "x-api-key": "***REDACTED***"
+  },
+  "body": {
+    "businessName": "ACME Corp",
+    "cuit": "30-****5678-1", 
+    "email": "a****@acmecorp.com",
+    "cbu": "285***************201"
+  }
+}
+```
+
+### Ejemplos de Logging de Errores
+
+#### Error de Cliente (400-499)
+```json
+{
+  "level": 40,
+  "msg": "Client error occurred",
+  "error": "Company with CUIT already exists",
+  "errorName": "DomainError", 
+  "statusCode": 409,
+  "method": "POST",
+  "url": "/v1/companies",
+  "requestId": "req-abc123",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "headers": {
+    "authorization": "***REDACTED***"
+  },
+  "body": {
+    "cuit": "30-****5678-1",
+    "email": "u***@example.com"
+  }
+}
+```
+
+#### Error de Servidor (500+)
+```json
+{
+  "level": 50, 
+  "msg": "Internal server error occurred",
+  "error": "Database connection failed",
+  "errorName": "Error",
+  "statusCode": 500,
+  "stack": "Error: Database connection failed\n    at DatabaseService.connect...",
+  "cause": "Code: ECONNREFUSED",
+  "requestId": "req-err123",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "datos_sensibles_redactados": true
+}
+```
+
+### Logging Mejorado en Modo Debug
+
+Con `LOG_LEVEL=debug`, se incluye contexto adicional con redacción completa:
+
+```json
+{
+  "level": 20,
+  "msg": "Incoming POST request",
+  "method": "POST",
+  "url": "/v1/companies",
+  "headers": {
+    "content-type": "application/json",
+    "authorization": "***REDACTED***",
+    "cookie": "***REDACTED***",
+    "user-agent": "curl/7.68.0"
+  },
+  "body": {
+    "businessName": "ACME Corp", 
+    "cuit": "30-****5678-1",
+    "email": "a****@acmecorp.com",
+    "cbu": "285***************201",
+    "address": "123 Main St"
+  },
+  "requestSize": "245 bytes",
+  "contentType": "application/json"
+}
+```

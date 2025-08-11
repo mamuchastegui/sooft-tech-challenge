@@ -11,6 +11,7 @@ import { tap } from 'rxjs/operators';
 import { PinoLogger } from 'nestjs-pino';
 import { Request, Response } from 'express';
 import { getOtelTraceInfo } from './otel-context.util';
+import { redactObject, redactHeaders } from './redact.util';
 
 @Injectable()
 export class RequestLoggerInterceptor implements NestInterceptor {
@@ -62,10 +63,12 @@ export class RequestLoggerInterceptor implements NestInterceptor {
       url: request.url,
       route: request.route?.path,
       query:
-        Object.keys(request.query || {}).length > 0 ? request.query : undefined,
+        Object.keys(request.query || {}).length > 0
+          ? redactObject(request.query)
+          : undefined,
       pathParams:
         Object.keys(request.params || {}).length > 0
-          ? request.params
+          ? redactObject(request.params)
           : undefined,
       requestId,
       userAgent: request.headers['user-agent'],
@@ -73,7 +76,7 @@ export class RequestLoggerInterceptor implements NestInterceptor {
       ...otelInfo,
     };
 
-    // Include payload size information in debug mode
+    // Include detailed information in debug mode with redaction
     if (process.env.LOG_LEVEL === 'debug') {
       const contentLength = request.headers['content-length'];
       if (contentLength) {
@@ -83,6 +86,17 @@ export class RequestLoggerInterceptor implements NestInterceptor {
       // Include content type for debug
       if (request.headers['content-type']) {
         logData['contentType'] = request.headers['content-type'];
+      }
+
+      // Include redacted headers in debug mode
+      logData['headers'] = redactHeaders(request.headers || {});
+
+      // Include redacted body if available (for POST/PUT requests)
+      if (
+        (request as any).body &&
+        Object.keys((request as any).body).length > 0
+      ) {
+        logData['body'] = redactObject((request as any).body);
       }
     }
 
@@ -114,13 +128,13 @@ export class RequestLoggerInterceptor implements NestInterceptor {
       ...otelInfo,
     };
 
-    // Add query and path params if they exist
+    // Add redacted query and path params if they exist
     if (Object.keys(request.query || {}).length > 0) {
-      baseLogData['query'] = request.query;
+      baseLogData['query'] = redactObject(request.query);
     }
 
     if (Object.keys(request.params || {}).length > 0) {
-      baseLogData['pathParams'] = request.params;
+      baseLogData['pathParams'] = redactObject(request.params);
     }
 
     // Include response size information in debug mode
