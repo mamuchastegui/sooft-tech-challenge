@@ -77,7 +77,7 @@ describe('Cuit Value Object', () => {
       // Test specific cases where DV calculation fails
       const invalidDVCases = [
         '20-12345678-5', // Should be 6
-        '27-12345678-5', // Should be 0  
+        '27-12345678-5', // Should be 0
         '30-50123456-7', // Should be 3
         '33-55555555-4', // Should be 8
         '34-99999999-1', // Should be 6

@@ -292,3 +292,167 @@ docker logs grafana-alloy --tail 100 | grep -E "(tempo|prom|error|success)"
 1. **Explore → Tempo**: `service.name="company-service"`
 2. **Explore → Prometheus**: Pegar queries PromQL
 3. **Dashboards → Import**: Usar `ops/grafana/dashboards/company-service-mini.json`
+
+## Logging Estructurado con Correlación
+
+### Configuración de Logs
+
+La aplicación utiliza logging estructurado con **Pino** y correlación automática de **OpenTelemetry**:
+
+```bash
+# Variables de entorno para logging
+LOG_LEVEL=info          # debug, info, warn, error
+NODE_ENV=production     # controls pretty printing (dev uses pino-pretty)
+```
+
+### Campos de Log Estándar
+
+Todos los logs incluyen automáticamente:
+
+```json
+{
+  "level": 30,
+  "time": 1673456789000,
+  "pid": 12345,
+  "hostname": "app-server",
+  "service": "company-service",
+  "env": "production",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "msg": "Request completed"
+}
+```
+
+### Tipos de Logs
+
+#### Request/Response Logging
+```json
+// Incoming request
+{
+  "msg": "Incoming GET request",
+  "method": "GET",
+  "url": "/v1/companies/123",
+  "route": "/v1/companies/:id",
+  "requestId": "req-abc123",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "userAgent": "curl/7.68.0",
+  "ip": "192.168.1.100"
+}
+
+// Response completed
+{
+  "msg": "GET /v1/companies/:id completed",
+  "method": "GET",
+  "statusCode": 200,
+  "duration_ms": 45.23,
+  "requestId": "req-abc123",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7"
+}
+```
+
+#### Error Logging
+```json
+// Client error (4xx)
+{
+  "level": 40,
+  "msg": "Client error occurred",
+  "error": "Company not found",
+  "errorName": "DomainError",
+  "statusCode": 404,
+  "method": "GET",
+  "url": "/v1/companies/999",
+  "requestId": "req-xyz789",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736"
+}
+
+// Server error (5xx)
+{
+  "level": 50,
+  "msg": "Internal server error occurred",
+  "error": "Database connection failed",
+  "errorName": "Error",
+  "statusCode": 500,
+  "stack": "Error: Database connection failed\n    at DatabaseService.connect...",
+  "cause": "Code: ECONNREFUSED",
+  "requestId": "req-err123",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736"
+}
+```
+
+### Correlación OpenTelemetry
+
+#### Búsqueda por Trace ID
+```bash
+# Buscar todos los logs relacionados a un trace específico
+grep "4bf92f3577b34da6a3ce929d0e0e4736" application.log
+
+# En herramientas de logging (ELK, Grafana Loki)
+trace_id:"4bf92f3577b34da6a3ce929d0e0e4736"
+```
+
+#### De Log a Trace
+1. Obtén el `trace_id` de cualquier log
+2. Ve a **Grafana → Explore → Tempo**
+3. Busca: `trace_id="4bf92f3577b34da6a3ce929d0e0e4736"`
+4. Explora el trace completo con spans, timing y contexto
+
+#### De Trace a Logs
+1. En **Tempo**, selecciona cualquier span
+2. Copia el `trace_id` del span context
+3. Ve a **Grafana → Explore → Loki** (o tu sistema de logs)
+4. Busca: `{service="company-service"} |= "4bf92f3577b34da6a3ce929d0e0e4736"`
+
+### Queries de Log Útiles
+
+#### Errores por Request ID
+```bash
+# Seguir toda la historia de un request específico
+grep "req-abc123" application.log | jq '.'
+```
+
+#### Errores 5xx con Contexto
+```json
+{
+  "query": "{service=\"company-service\"} | json | statusCode >= 500",
+  "timeRange": "24h"
+}
+```
+
+#### Performance Slow Queries
+```json
+{
+  "query": "{service=\"company-service\"} | json | duration_ms > 1000",
+  "fields": ["method", "url", "duration_ms", "trace_id"]
+}
+```
+
+#### Domain Errors por Tipo
+```bash
+# Buscar errores específicos del dominio
+grep '"errorName":"DomainError"' application.log | \
+  jq -r '[.time, .statusCode, .error, .trace_id] | @tsv'
+```
+
+### Debug Mode
+
+Para logs más verbosos durante desarrollo:
+
+```bash
+LOG_LEVEL=debug NODE_ENV=development npm run start:otel
+```
+
+Logs de debug incluyen:
+- Request/response payload sizes
+- Query parameters y path params
+- Headers adicionales
+- Stack traces completos
+- Timing detallado
+
+### Log Analysis Workflow
+
+1. **Detectar Error**: Monitoring/alerting basado en `level >= 50`
+2. **Obtener Contexto**: Usar `requestId` para seguir flujo completo
+3. **Correlación**: Usar `trace_id` para ver timing y dependencies en Tempo
+4. **Root Cause**: Stack trace + cause information en logs structured

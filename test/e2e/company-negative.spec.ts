@@ -62,8 +62,10 @@ describe('Company Negative E2E Tests', () => {
           .expect(HttpStatus.BAD_REQUEST)
           .expect((res) => {
             expect(res.body.statusCode).toBe(HttpStatus.BAD_REQUEST);
-            const messages = Array.isArray(res.body.message) ? res.body.message : [res.body.message];
-            expect(messages.some(msg => /CUIT/i.test(msg))).toBe(true);
+            const messages = Array.isArray(res.body.message)
+              ? res.body.message
+              : [res.body.message];
+            expect(messages.some((msg) => /CUIT/i.test(msg))).toBe(true);
           });
       }
     });
@@ -86,8 +88,12 @@ describe('Company Negative E2E Tests', () => {
           .expect(HttpStatus.BAD_REQUEST)
           .expect((res) => {
             expect(res.body.statusCode).toBe(HttpStatus.BAD_REQUEST);
-            const messages = Array.isArray(res.body.message) ? res.body.message : [res.body.message];
-            expect(messages.some(msg => msg.includes('Invalid CUIT checksum'))).toBe(true);
+            const messages = Array.isArray(res.body.message)
+              ? res.body.message
+              : [res.body.message];
+            expect(
+              messages.some((msg) => msg.includes('Invalid CUIT checksum')),
+            ).toBe(true);
           });
       }
     });

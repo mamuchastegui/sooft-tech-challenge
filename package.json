@@ -23,7 +23,13 @@
     "db:seed": "ts-node scripts/seed.ts",
     "db:migrate": "ts-node scripts/migrate.ts",
     "db:refresh-mv": "ts-node scripts/refresh-mv.ts",
-    "start:otel": "NODE_OPTIONS='-r ./otel-register.cjs' nest start --watch"
+    "start:otel": "NODE_OPTIONS='-r ./otel-register.cjs' nest start --watch",
+    "load:smoke": "k6 run ops/load/k6/scenarios/smoke.js",
+    "load:baseline": "k6 run ops/load/k6/scenarios/baseline.js",
+    "load:stress": "k6 run ops/load/k6/scenarios/stress.js",
+    "load:spike": "k6 run ops/load/k6/scenarios/spike.js",
+    "load:soak": "k6 run ops/load/k6/scenarios/soak.js",
+    "load:write": "k6 run ops/load/k6/scenarios/write.js"
   },
   "dependencies": {
     "@aws-sdk/client-sqs": "^3.859.0",

@@ -1,6 +1,14 @@
 // src/application/dto/create-company.dto.ts
 
-import { IsNotEmpty, IsString, Matches, IsIn, IsNumber, IsPositive, Validate } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  Matches,
+  IsIn,
+  IsNumber,
+  IsPositive,
+  Validate,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import {
   CompanyType,

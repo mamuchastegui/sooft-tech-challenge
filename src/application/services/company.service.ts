@@ -23,7 +23,6 @@ export class CompanyService {
   async createCompany(
     createCompanyDto: CreateCompanyDto,
   ): Promise<CompanyResponseDto> {
-
     const existingCompany = await this.companyRepository.findByCuit(
       createCompanyDto.cuit,
     );

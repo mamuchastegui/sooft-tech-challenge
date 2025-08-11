@@ -59,9 +59,7 @@ export class Money {
   subtract(other: Money): Money {
     const result = this.amount - other.amount;
     if (result < 0) {
-      throw new DomainError(
-        'Money amount cannot be negative',
-      );
+      throw new DomainError('Money amount cannot be negative');
     }
     return new Money(result);
   }

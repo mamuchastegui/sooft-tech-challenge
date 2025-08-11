@@ -70,7 +70,9 @@ describe('AccountId Value Object', () => {
 
       invalidAccounts.forEach((invalidAccount) => {
         expect(() => AccountId.create(invalidAccount)).toThrow(DomainError);
-        expect(() => AccountId.create(invalidAccount)).toThrow(/must be exactly 13 digits/);
+        expect(() => AccountId.create(invalidAccount)).toThrow(
+          /must be exactly 13 digits/,
+        );
       });
     });
 

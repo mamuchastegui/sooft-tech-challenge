@@ -5,18 +5,15 @@ import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { Logger } from 'nestjs-pino';
 import { AppModule } from './app.module';
-import { AllExceptionsFilter } from './presentation/filters/all-exceptions.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
 
-  // Set up structured logging
+  // Set up structured logging with OpenTelemetry correlation
   app.useLogger(app.get(Logger));
 
-  // Set up global exception filter
-  // PinoLogger is request-scoped, so we create filter without logger for now
-  // The filter will get the logger from the request context when needed
-  app.useGlobalFilters(new AllExceptionsFilter(null));
+  // Global exception filter and request interceptor are now registered
+  // in LoggingModule as providers with proper dependency injection
 
   app.useGlobalPipes(
     new ValidationPipe({

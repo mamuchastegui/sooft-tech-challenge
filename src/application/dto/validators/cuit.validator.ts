@@ -1,6 +1,10 @@
 // src/application/dto/validators/cuit.validator.ts
 
-import { ValidatorConstraint, ValidatorConstraintInterface, ValidationArguments } from 'class-validator';
+import {
+  ValidatorConstraint,
+  ValidatorConstraintInterface,
+  ValidationArguments,
+} from 'class-validator';
 import { Cuit } from '../../../domain/value-objects/cuit';
 
 @ValidatorConstraint({ name: 'cuit', async: false })
